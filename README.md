@@ -46,7 +46,85 @@ You need npm/yarn installed in your local machine in order to run this app.
 - [Docs for passport-google-oauth20](http://www.passportjs.org/packages/passport-google-oauth20/)
 - [Docs for passport-jwt](http://www.passportjs.org/packages/passport-jwt/)
 - [Docs for reCaptcha verification](https://developers.google.com/recaptcha/docs/verify)
+
+## Project Structure
+
+```
+/
+|-- config/			
+    |-- auth.config.js         #Contains function for JWT authentication and verification
+    |-- db.config.js           #Contains configuration for mongoDB NoSQL Database
+|    
+|-- controllers/
+    |-- auth.controller.js     #Contains http request controllers for user authentication
+    |-- user.controller.js     #Contains http request controllers for user methods
+    |-- project.controller.js  #Contains http request controllers for project methods
+    |-- form.controller.js     #Contains http request controllers for form methods
+    |-- main.controller.js     #Contains http request controllers for main form submission
+|
+|-- middlewares/               #Contains all required middlewares
+    |-- auth.middleware.js     #Contains User Authentication middleware
+    |-- file.middleware.js     #Contains File upload handling middlware
+|
+|-- models/
+    |-- user.model.js
+    |-- project.model.js
+    |-- form.model.js
+    |-- formSubmissions.model.js
+|
+|-- routes/                   #Contains all routes
+|-- utils/
+    |-- constants.js          #Contains all constants for the project
+    |-- mailer.js             #Contains email sending utility
+    |-- password.js           #Contains password hashing and verification utility
+    |-- responseCodes.js      #Contains predefined responses for status codes
+|
+|-- app.js
+
+```
   
+## Models
+
+### User Model
+
+- name: String
+- email : String
+- passwordHash: String
+- dateCreated : Date
+- projects : Array<Project>
+
+### Project Model
+
+- name: String
+- id: String
+- owner: User
+- dateCreated : Date
+- collaborators : Array<User>
+- forms: Array<Form>
+- allowedOrigins: Array<String>
+- reCaptchaKey: String
+- reCaptchaSecret: String
+
+### Form Model
+
+- name: String
+- id: String
+- project : Project
+- schema:  Object
+- hasFileField : Boolean
+- submissions: Array<FormSubmission>
+- dateCreated : Date
+- hasRecaptchaVerification: Boolean
+
+### Form Submission Model
+
+- id : String
+- form : Form
+- data : Object
+- file : File
+- dateCreated: Date
+
+
 ## Claim an issue
 Comment on the issue. In case of no activity on the issue even after 2 days, the issue will be reassigned. If you have difficulty approaching the issue, feel free to ask on our discord channel.
 ## Communication 
