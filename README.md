@@ -90,7 +90,7 @@ You need npm/yarn installed in your local machine in order to run this app.
 - name: String
 - email : String
 - passwordHash: String
-- dateCreated : Date
+- verified : Boolean
 - projects : Array<Project>
 
 ### Project Model
@@ -98,7 +98,6 @@ You need npm/yarn installed in your local machine in order to run this app.
 - name: String
 - id: String
 - owner: User
-- dateCreated : Date
 - collaborators : Array<User>
 - forms: Array<Form>
 - allowedOrigins: Array<String>
@@ -113,7 +112,6 @@ You need npm/yarn installed in your local machine in order to run this app.
 - schema:  Object
 - hasFileField : Boolean
 - submissions: Array<FormSubmission>
-- dateCreated : Date
 - hasRecaptchaVerification: Boolean
 
 ### Form Submission Model
@@ -122,7 +120,6 @@ You need npm/yarn installed in your local machine in order to run this app.
 - form : Form
 - data : Object
 - file : File
-- dateCreated: Date
 
 
 ## Claim an issue
