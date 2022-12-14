@@ -16,7 +16,7 @@ db();
 
 app.use(
   morgan(
-    '[:date[clf]] ":method :url :status" :res[content-length] - :response-time ms',
+    process.env["ENV"]==='dev'?'[:date[clf]] ":method :url :status" :res[content-length] - :response-time ms':':remote-addr - [:date[clf]] ":method :url :status" :res[content-length] - :response-time ms'
   ),
 );
 
