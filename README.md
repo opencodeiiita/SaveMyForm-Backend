@@ -122,6 +122,20 @@ You need npm/yarn installed in your local machine in order to run this app.
 - file : File
 
 
+## Enviornment Variables
+
+- MONGO_DB_CONN_STRING : required
+- SECRET : (random string) required
+- GOOGLE_OAUTH_CLIENT_ID : optional
+- GOOGLE_OAUTH_CLIENT_SECRET : optional
+- GOOGLE_RECAPTCHA_SITE_KEY : optional 
+- GOOGLE_RECAPTCHA_SECRET_KEY : optional
+- MAIL_ADDRESS : optional
+- MAIL_ADDRESS : optional
+- PORT : optional
+- ENV : 'dev' or 'prod'
+
+
 ## Claim an issue
 Comment on the issue. In case of no activity on the issue even after 2 days, the issue will be reassigned. If you have difficulty approaching the issue, feel free to ask on our discord channel.
 ## Communication 
