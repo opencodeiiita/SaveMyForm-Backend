@@ -18,9 +18,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    projects:{
-        type: Array
-    }
+    projects:[
+        { type: ObjectId,ref: 'project' }
+    ]
 }, { timestamps: true });
 
 const User = model('user', userSchema);
