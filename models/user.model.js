@@ -1,6 +1,27 @@
 import { model, Schema } from 'mongoose';
 
-const userSchema = new Schema({}, { timestamps: true });
+const userSchema = new Schema({
+    name:{
+        type: String,
+        required: true,
+        trim: true
+    },
+    email:{
+        type: String,
+        required: true,
+        trim: true
+    },
+    passwordHash:{
+        type: String
+    },
+    verfied:{
+        type: Boolean,
+        default: false
+    },
+    projects:{
+        type: Array
+    }
+}, { timestamps: true });
 
 const User = model('user', userSchema);
 
