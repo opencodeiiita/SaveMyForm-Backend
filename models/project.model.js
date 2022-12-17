@@ -19,7 +19,7 @@ const projectSchema = new Schema(
         id: {
             type: String,
             required: true,
-            default: { generate(16) }
+            default: generate(16) 
         },
         owner: {
             type: Schema.Types.ObjectId,
