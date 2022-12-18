@@ -7,4 +7,4 @@ const hash_password=(password)=>{
      const hasPassword=bcrypt.hash(password,process.env.SECRET);
     return  hasPassword;
 }
-export default hash_password;
+export  hash_password;
