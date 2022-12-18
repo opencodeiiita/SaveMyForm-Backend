@@ -1,8 +1,10 @@
 import bcrypt from 'bcryptjs';
+import dotev from 'dotenv';
 
-const hash_password=async(req,res)=>{
-    const {password}=req.body;
-    const hasPassword=await bcrypt.hash(password,12);
-    req.body.password=hasPassword;
+dotev.config()
+
+const hash_password=(password)=>{
+     const hasPassword=bcrypt.hash(password,process.env.SALT_KEY);
+    return  password=hasPassword;
 }
 export default hash_password;
