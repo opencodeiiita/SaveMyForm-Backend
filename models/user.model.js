@@ -19,7 +19,7 @@ const userSchema = new Schema({
         default: false
     },
     projects:[
-        { type: ObjectId,ref: 'project' }
+        { type: Schema.Types.ObjectId ,ref: 'project' }
     ]
 }, { timestamps: true });
 
