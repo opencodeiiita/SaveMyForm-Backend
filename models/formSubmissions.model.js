@@ -1,7 +1,35 @@
 import { Schema, model } from 'mongoose';
 
-const formSubmissionSchema = new Schema({}, { timestamps: true });
+function generate(length){
+    const characters = "qwertyuiopasdfghjklzxcvbnm1234567890";
+    let str = "";
+    const reqlength = characters.length;
+    for(let i=0;i<length;i++){
+        result += characters.charAt(Math.floor(Math.random() * reqlength));
+    }
 
-const FormSubmission = model('formSubmission', formSubmissionSchema);
+    return result;
+}
+
+const formSubmissionSchema = new Schema({
+
+    id : {
+        type : String,
+        require : true,
+        default : generate(16)
+    },
+    form : {
+        type : Schema.Types.ObjectId,
+        ref : 'form'
+    },
+    data : Object,
+    file : {
+        type : Buffer,
+    },
+    
+}, { timestamps: true });
+
+const FormSubmission = model('formSubmission',formSubmissionSchema);
 
 export default FormSubmission;
+
