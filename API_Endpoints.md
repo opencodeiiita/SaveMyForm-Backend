@@ -36,6 +36,7 @@ The following properties of every endpoint will be descibed in this file:
   * **Success Status Code:** *(Status Code of a successful response) 2xx*
   * **Response Data:** *(The format of data which is expected from the server with a successful response)*
 
+---
 
 ## Auth Endpoints
 > *Base URI: `/`*
