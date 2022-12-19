@@ -3,34 +3,19 @@ import dotev from 'dotenv';
 
 dotev.config()
 
-function base64UrlEncode(str) {
-  // Encode the string as base64
-  const base64 = btoa(str);
-
-  // Replace characters that are not URL-safe with their URL-safe counterparts
-  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
+const jwt = require('jsonwebtoken');
 
 export function getJwt(object){
-  // Set the algorithm for signing the JWT
-  const algorithm = 'HS256';
-
-  // Set the JWT header
-  const header = {
-    alg: algorithm,
-    typ: 'JWT'
+  const secret = process.env.SECRET; 
+  const options = {
+    algorithm: 'HS256', // Use HS256 algorithm
+    expiresIn: '1h' // Token expires in one hour
   };
 
-  // Encode the header and payload as base64 strings
-  const base64Header = base64UrlEncode(JSON.stringify(header));
-  const base64Payload = base64UrlEncode(JSON.stringify(object));
+  // Sign the JWT with the payload, secret key, and options
+  const token = jwt.sign({ payload: object }, secret, options);
 
-  // Create the signature
-  const signature = process.env.SECRET;
-
-  // Return the JWT
-  return `${base64Header}.${base64Payload}.${signature}`;
+  return token;
 }
 
 export function hash_password(password){
