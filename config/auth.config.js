@@ -1,6 +1,6 @@
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
-import GoogleStrategy from 'passport-google-oauth20';
+import { OAuth2Client } from 'google-auth-library';
 import { Strategy as JWTStrategy } from 'passport-jwt';
 
 // Strategy function for local signin authentication
@@ -8,9 +8,6 @@ import { Strategy as JWTStrategy } from 'passport-jwt';
 
 // Strategy function for local signup authentication
 // paasport.use('user-signup-local',);
-
-// Strategy function for Google OAuth2.0 authentication
-// paasport.use('google-auth',);
 
 // Strategy function for Google OAuth2.0 authentication
 // paasport.use('google-auth',);
