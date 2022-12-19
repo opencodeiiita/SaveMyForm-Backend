@@ -22,7 +22,10 @@ const formSchema = new Schema({
         type: Boolean,
         default: false
     },
-    submissions: [],
+    submissions: [{
+        type: Schema.Types.ObjectId,
+        ref:'formSubmission'
+    }],
     hasRecaptchaVerification: {
         type: Boolean,
         default: false
