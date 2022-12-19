@@ -3,13 +3,13 @@ import dotev from 'dotenv';
 
 dotev.config()
 
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 export function getJwt(object){
   const secret = process.env.SECRET; 
   const options = {
     algorithm: 'HS256', // Use HS256 algorithm
-    expiresIn: '1h' // Token expires in one hour
+    expiresIn: '30d' // Token expires in one hour
   };
 
   // Sign the JWT with the payload, secret key, and options
