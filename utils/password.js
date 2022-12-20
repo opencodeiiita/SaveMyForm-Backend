@@ -1,9 +1,10 @@
-import bcrypt from 'bcryptjs';
 import dotev from 'dotenv';
 
 dotev.config()
 
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+
 
 export function getJwt(object){
   const secret = process.env.SECRET; 
@@ -18,7 +19,10 @@ export function getJwt(object){
   return token;
 }
 
-export function hash_password(password){
-     const hasPassword=bcrypt.hash(password,process.env.SECRET);
-    return  hasPassword;
+export async function hash_password(password){
+    var salt = process.env.SECRET;
+    var genHash = crypto
+      .pbkdf2Sync(password, salt, 10000, 64, "sha512")
+      .toString("hex");
+    return genHash;
 }
