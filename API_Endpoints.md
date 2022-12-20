@@ -59,6 +59,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User Name",
   "email": "test@test.com",
+  "verfied": true,
   "secret": "JWT Token"
 }
 ```
@@ -82,6 +83,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User Name",
   "email": "test@test.com",
+  "verfied": false,
   "secret": "JWT Token"
 }
 ```
@@ -102,6 +104,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User Name",
   "email": "test@test.com",
+  "verfied": true,
   "secret": "JWT Token"
 }
 ```
