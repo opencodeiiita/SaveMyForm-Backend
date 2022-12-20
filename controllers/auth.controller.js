@@ -5,7 +5,7 @@ import verifycaptcha from '../utils/recaptcha.js';
 
 export async function logIn(req, res) {
   const {email, recaptcha_token} = req.body;
-  if(!verifycaptcha(recaptcha_token)) return response_404(res, "Captcha was found incorrect!");
+  if(!verifycaptcha(recaptcha_token)) return response_400(res, "Captcha was found incorrect!");
   const password = await hash_password(req.body.password);
   
   try {
