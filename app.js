@@ -20,8 +20,6 @@ app.use(
   ),
 );
 
-import passport from './config/auth.config.js';
-app.use(passport.initialize());
 
 import authRoutes from './routes/auth.routes.js';
 app.use('/', authRoutes);

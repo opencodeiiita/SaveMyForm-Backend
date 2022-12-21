@@ -1,4 +1,3 @@
-import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import { OAuth2Client } from 'google-auth-library';
 import { Strategy as JWTStrategy } from 'passport-jwt';
