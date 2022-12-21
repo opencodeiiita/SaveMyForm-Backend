@@ -1,21 +1,18 @@
 import nodemailer from 'nodemailer'
 
-export default function mailer(email, body, html) {
+export function mailer(subject, email, body, html) {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      type: 'OAuth2',
       user: process.env.MAIL_ADDRESS,
-      pass: process.env.MAIL_PASSWORD,
-      clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+      pass: process.env.MAIL_PASSWORD
     }
   });
   
   let mailOptions = {
     from: process.env.MAIL_ADDRESS,
     to: email,
-    subject: 'Sending Email using Node.js', // Sending Subject text as argument would be better
+    subject: subject,
     text: body,
     html: html
   };
