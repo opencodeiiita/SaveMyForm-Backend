@@ -2,7 +2,8 @@
   "name": "save_my_form-backend",
   "version": "0.1.0",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "NODE_ENV=development nodemon app.js",
+    "start-prod": "NODE_ENV=production nodemon app.js"
   },
   "description": "Backend for the project SaveMyForm. Backend Less form submission collection for your application",
   "main": "app.js",

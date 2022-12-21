@@ -3,6 +3,10 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 
+// conf for recaptcha
+const { promisify } = require('util');
+const request = promisify(require('request'));
+
 dotenv.config();
 
 const app = express();
