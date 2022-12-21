@@ -38,7 +38,7 @@ export async function signUp(req,res){
     email,
     name,
     passwordHash: password,
-    verified: process.env.verified
+    verified: process.env.ENV === 'prod' ? false : true
   }
   try{
     newUser = await newUser.save()
