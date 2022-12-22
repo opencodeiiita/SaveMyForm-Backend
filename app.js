@@ -2,10 +2,12 @@ import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
+import cors from 'cors'
 
 dotenv.config();
 
 const app = express();
+app.use(cors())
 
 // supporting content types json, urlencoded for now
 app.use(bodyParser.json());
