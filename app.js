@@ -4,6 +4,10 @@ import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import cors from 'cors'
 
+// conf for recaptcha
+const { promisify } = require('util');
+const request = promisify(require('request'));
+
 dotenv.config();
 
 const app = express();
