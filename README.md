@@ -53,7 +53,6 @@ You need npm/yarn installed in your local machine in order to run this app.
 ```
 /
 |-- config/			
-    |-- auth.config.js         #Contains function for JWT authentication and verification
     |-- db.config.js           #Contains configuration for mongoDB NoSQL Database
 |    
 |-- controllers/
@@ -132,7 +131,7 @@ You need npm/yarn installed in your local machine in order to run this app.
 - GOOGLE_RECAPTCHA_SITE_KEY : optional 
 - GOOGLE_RECAPTCHA_SECRET_KEY : optional
 - MAIL_ADDRESS : optional
-- MAIL_ADDRESS : optional
+- MAIL_PASSWORD : optional
 - PORT : optional
 - ENV : 'dev' or 'prod'
 
