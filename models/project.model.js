@@ -35,7 +35,11 @@ const projectSchema = new Schema(
         },
         allowedOrigins: [{ type: String }],
         reCaptchaKey: String,
-        reCaptchaSecret: String
+        reCaptchaSecret: String,
+        allowRecaptcha: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true
