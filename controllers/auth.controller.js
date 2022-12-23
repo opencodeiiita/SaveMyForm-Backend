@@ -21,6 +21,7 @@ export async function logIn(req, res) {
     if (!checkUser) return response_404(res, "User Doesn't exist");
     const checkPassword = password === checkUser.passwordHash;
     if (!checkPassword) return response_400(res, 'Password is incorrect');
+    if(checkUser.passwordHash === "") return response_400(res, 'Account created using Google Auth, either change your password or Signin with Google');
     const jwtToken = getJwt({ id: checkUser._id, email: email });
     return response_200(res, 'Log In Succesful', {
       name: checkUser.name,
