@@ -14,6 +14,7 @@ const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
 export async function logIn(req, res) {
   const { email, recaptcha_token } = req.body;
+  if(!(email && recaptcha_token)) return response_400(res, 'Some parameters are missing!')
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha was found incorrect!');
   const password = await hash_password(req.body.password);
@@ -43,6 +44,7 @@ export function greet(req, res) {
 
 export async function signUp(req, res) {
   const { name, email, recaptcha_token } = req.body;
+  if(!(name && email && recaptcha_token)) return response_400(res, 'Some parameters are missing!')
   if (req.body.password.length < 6)
     return response_400(res, 'Password must be longer than 6 letters');
   if (!validator.isEmail(email)) return response_400(res, 'Email is invalid');
@@ -73,41 +75,42 @@ export async function signUp(req, res) {
 
 export async function authGoogle(req,res) {
   const { token }  = req.body
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: process.env.GOOGLE_OAUTH_CLIENT_ID
-    });
-    const { name, email } = ticket.getPayload(); 
-    try{
-      const checkUser = await User.exists({ email });
-      if(checkUser){
-        const jwtToken = getJwt({ id: checkUser._id, email: email });
-        return response_200(res, 'Log In Succesful', {
-          name: checkUser.name,
-          email: email,
-          verfied: checkUser.verfied,
-          secret: jwtToken,
-        })
-      }
-      else{
-        const password = ''
-        let newUser = User({
-          email,
-          name,
-          passwordHash: password,
-          verified: process.env.ENV === 'prod' ? false : true,
-        });
-        newUser = await newUser.save();
-        const jwtToken = getJwt({ id: newUser._id, email: newUser.email });
-        return response_201(res, 'Sign Up Succesful', {
-          name,
-          email,
-          verfied: newUser.verified,
-          secret: jwtToken,
-        });
-      }
+  if(!(token)) return response_400(res, 'The token is missing!')
+  const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_OAUTH_CLIENT_ID
+  });
+  const { name, email } = ticket.getPayload(); 
+  try{
+    const checkUser = await User.exists({ email });
+    if(checkUser){
+      const jwtToken = getJwt({ id: checkUser._id, email: email });
+      return response_200(res, 'Log In Succesful', {
+        name: checkUser.name,
+        email: email,
+        verfied: checkUser.verfied,
+        secret: jwtToken,
+      })
     }
-    catch(error){
-      return response_500(res, 'Internal server error', error);
+    else{
+      const password = ''
+      let newUser = User({
+        email,
+        name,
+        passwordHash: password,
+        verified: process.env.ENV === 'prod' ? false : true,
+      });
+      newUser = await newUser.save();
+      const jwtToken = getJwt({ id: newUser._id, email: newUser.email });
+      return response_201(res, 'Sign Up Succesful', {
+        name,
+        email,
+        verfied: newUser.verified,
+        secret: jwtToken,
+      });
     }
+  }
+  catch(error){
+    return response_500(res, 'Internal server error', error);
+  }
 }
