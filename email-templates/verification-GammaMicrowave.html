@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .card {
+        position: fixed;
+        left: 20vw;
+        top: 30vh;
+        width: 60vw;
+        height: 40vh;
+        background-color: #011E2B;
+        border-radius: 32px;
+        filter: drop-shadow(0px 0px 5px #000000);
+        padding: 20px;
+        text-align: center;
+      }
+      span{
+        color: #01EC64;
+        font-weight: 700;
+      }
+      h5{
+        transform: translateY(-40px);
+        color: white;
+        font-weight: 500;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 32px;
+        vertical-align: text-top;
+      }
+      button{
+        background-color: #01EC64;
+        outline: none;
+        border: none;
+        border-radius: 18px;
+        min-width: 125px;
+        padding: 12px 24px 12px 16px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        filter: drop-shadow(0px 0px 5px #000000);
+      }
+      .left-svg {
+        z-index: 0;
+        position: relative;
+      }
+      .left-svg-div {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 40vw;
+        height: 100vh;
+      }
+      .right-svg-div {
+        position: fixed;
+        left: 40vw;
+        top: 0;
+        width: 60vw;
+        height: 100vh;
+      }
+      .right-svg-1 {
+        z-index: 0;
+        position: absolute;
+        right: 0;
+        bottom: 23vh;
+        width: 15vw;
+        height: 55vh;
+      }
+      .right-svg-2 {
+        z-index: 10;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: 40vw;
+        height: 60vh;
+      }
+      @media(max-width : 900px) {
+        h5{
+            font-size: 28px
+        }
+      }
+      @media(max-width:600px){
+        h5{
+            font-size:24px
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="left-svg-div">
+      <svg
+        class="left-svg"
+        width="100%"
+        height="100%"
+        viewBox="0 0 782 915"
+        preserveAspectRatio="none"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M455.672 627.804C369.814 810.739 144.776 741.966 3.16007e-06 958L0 0H782C709.038 41.4991 555.911 166.991 527.103 336.967C498.295 506.943 467.479 601.682 455.672 627.804Z"
+          fill="#00694B"
+        />
+      </svg>
+    </div>
+    <div class="card">
+        <h5>
+            In order to use our <span>services</span> you need to first verify your email.
+            <span>Click</span> on the button below to <span>verify</span> your email.
+        </h5>
+        <button>
+            Verify Email
+        </button>
+    </div>
+    <div class="right-svg-div">
+      <div class="right-svg-1">
+        <svg
+          width="100%"
+          height="100%"
+          preserveAspectRatio="none"
+          viewBox="0 0 258 480"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M19.9272 403.601C18.2493 427.678 5.94327 464.566 0 480C34.8912 476.082 143.973 373.824 143.973 373.824C143.973 373.824 231.149 283.2 258 262.751V0C164.184 59.6585 96.5177 146.281 69.2197 189.839C18.2833 271.116 22.0246 373.505 19.9272 403.601Z"
+            fill="#00694B"
+          />
+        </svg>
+      </div>
+      <div class="right-svg-2">
+        <svg
+          width="100%"
+          height="100%"
+          preserveAspectRatio="none"
+          viewBox="0 0 675 434"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M392.974 287.71C258.344 372.18 108.189 396.71 0 434H686V0.0493975H679.7C652.047 -3.63856 532.542 200.142 392.974 287.71Z"
+            fill="#01EC64"
+          />
+        </svg>
+      </div>
+  </body>
+</html>
