@@ -14,7 +14,7 @@ const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
 export async function logIn(req, res) {
   const { email, recaptcha_token } = req.body;
-  if(!(email && recaptcha_token)) return response_400(res, 'Some parameters are missing!')
+  if(!(email && recaptcha_token && req.body.password)) return response_400(res, 'Some parameters are missing!')
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha was found incorrect!');
   const password = await hash_password(req.body.password);
@@ -44,7 +44,7 @@ export function greet(req, res) {
 
 export async function signUp(req, res) {
   const { name, email, recaptcha_token } = req.body;
-  if(!(name && email && recaptcha_token)) return response_400(res, 'Some parameters are missing!')
+  if(!(name && email && recaptcha_token && req.body.password)) return response_400(res, 'Some parameters are missing!')
   if (req.body.password.length < 6)
     return response_400(res, 'Password must be longer than 6 letters');
   if (!validator.isEmail(email)) return response_400(res, 'Email is invalid');
