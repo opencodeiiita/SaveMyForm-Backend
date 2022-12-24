@@ -7,22 +7,25 @@
     <title>Document</title>
     <style>
       .card {
-        position: fixed;
-        left: 20vw;
+        position: absolute;
+        /* left: 20%; */
+        right: 20vw;
         top: 30vh;
+        /* margin-left: 20vw; */
+        /* margin-top: 30vh; */
         width: 60vw;
         height: 40vh;
-        background-color: #011E2B;
+        background-color: #011e2b;
         border-radius: 32px;
         filter: drop-shadow(0px 0px 5px #000000);
         padding: 20px;
         text-align: center;
       }
-      span{
-        color: #01EC64;
+      span {
+        color: #01ec64;
         font-weight: 700;
       }
-      h5{
+      h5 {
         transform: translateY(-40px);
         color: white;
         font-weight: 500;
@@ -30,8 +33,9 @@
         font-size: 32px;
         vertical-align: text-top;
       }
-      button{
-        background-color: #01EC64;
+      button {
+        z-index: 24;
+        background-color: #01ec64;
         outline: none;
         border: none;
         border-radius: 18px;
@@ -42,6 +46,10 @@
         font-weight: 700;
         filter: drop-shadow(0px 0px 5px #000000);
       }
+      button:hover {
+        background-color: cyan;
+      }
+
       .left-svg {
         z-index: 0;
         position: relative;
@@ -76,14 +84,14 @@
         width: 40vw;
         height: 60vh;
       }
-      @media(max-width : 900px) {
-        h5{
-            font-size: 28px
+      @media (max-width: 900px) {
+        h5 {
+          font-size: 28px;
         }
       }
-      @media(max-width:600px){
-        h5{
-            font-size:24px
+      @media (max-width: 600px) {
+        h5 {
+          font-size: 24px;
         }
       }
     </style>
@@ -104,15 +112,6 @@
           fill="#00694B"
         />
       </svg>
-    </div>
-    <div class="card">
-        <h5>
-            In order to use our <span>services</span> you need to first verify your email.
-            <span>Click</span> on the button below to <span>verify</span> your email.
-        </h5>
-        <button>
-            Verify Email
-        </button>
     </div>
     <div class="right-svg-div">
       <div class="right-svg-1">
@@ -145,5 +144,14 @@
           />
         </svg>
       </div>
+    </div>
+    <div class="card">
+      <h5>
+        In order to use our <span>services</span> you need to first verify your
+        email. <span>Click</span> on the button below to
+        <span>verify</span> your email.
+      </h5>
+      <button>Verify Email</button>
+    </div>
   </body>
 </html>
