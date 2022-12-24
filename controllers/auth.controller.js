@@ -9,6 +9,8 @@ import { hash_password, getJwt } from '../utils/password.js';
 import User from '../models/user.model.js';
 import verifycaptcha from '../utils/recaptcha.js';
 import validator from 'validator';
+import { OAuth2Client } from 'google-auth-library';
+const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 
 export async function logIn(req, res) {
   const { email, recaptcha_token } = req.body;
@@ -67,4 +69,45 @@ export async function signUp(req, res) {
   } catch (error) {
     return response_500(res, 'Internal server error', error);
   }
+}
+
+export async function authGoogle(req,res) {
+  const { token }  = req.body
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_OAUTH_CLIENT_ID
+    });
+    const { name, email } = ticket.getPayload(); 
+    try{
+      const checkUser = await User.exists({ email });
+      if(checkUser){
+        const jwtToken = getJwt({ id: checkUser._id, email: email });
+        return response_200(res, 'Log In Succesful', {
+          name: checkUser.name,
+          email: email,
+          verfied: checkUser.verfied,
+          secret: jwtToken,
+        })
+      }
+      else{
+        const password = ''
+        let newUser = User({
+          email,
+          name,
+          passwordHash: password,
+          verified: process.env.ENV === 'prod' ? false : true,
+        });
+        newUser = await newUser.save();
+        const jwtToken = getJwt({ id: newUser._id, email: newUser.email });
+        return response_201(res, 'Sign Up Succesful', {
+          name,
+          email,
+          verfied: newUser.verified,
+          secret: jwtToken,
+        });
+      }
+    }
+    catch(error){
+      return response_500(res, 'Internal server error', error);
+    }
 }
