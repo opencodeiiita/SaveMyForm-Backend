@@ -9,7 +9,7 @@ const authMiddleware = async (req, res, next) => {
         
         if (!authHeader || !/(Bearer )\w+/.test(authHeader)) {
             // authorization header is not present or is not of the required format
-            return response_401(req, "Request is unauthorized");
+            return response_401(res, "Request is unauthorized");
         }
         
         // extracting the token and verifying it
@@ -25,7 +25,7 @@ const authMiddleware = async (req, res, next) => {
         
         if (!user) {
             // user is not present in DB
-            return response_400(req, "Request is invalid")
+            return response_400(res, "Request is invalid")
         }
         
         req.user = user;
@@ -34,7 +34,7 @@ const authMiddleware = async (req, res, next) => {
         req.isAuthenticated = false;
     }
 
-    next(req, res)
+    next()
 }
 
 export default authMiddleware;
