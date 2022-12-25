@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import hbs from 'nodemailer-express-handlebars';
+import path from 'path';
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -28,4 +30,28 @@ export function mailer(subject, email, body, html) {
 
 export function sendVerificationLink(email, secret) {
   let link = 'http://savemyform.tk/verify/' + secret;
+  const handlebarOptions = {
+    viewEngine: {
+        partialsDir: path.resolve('../templates/'),
+        defaultLayout: false,
+    },
+    viewPath: path.resolve('../templates/'),
+};
+  transporter.use('compile',hbs(handlebarOptions))
+  var mailOptions = {
+    from: process.env.MAIL_ADDRESS,
+    to: email,
+    subject: 'Email verification link',
+    template: 'verification',
+    context:{
+        url:link
+    }
+  };
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 }
