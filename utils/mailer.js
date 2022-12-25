@@ -1,14 +1,14 @@
 import nodemailer from 'nodemailer';
 
-export function mailer(subject, email, body, html) {
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.MAIL_ADDRESS,
-      pass: process.env.MAIL_PASSWORD,
-    },
-  });
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.MAIL_ADDRESS,
+    pass: process.env.MAIL_PASSWORD,
+  },
+});
 
+export function mailer(subject, email, body, html) {
   let mailOptions = {
     from: process.env.MAIL_ADDRESS,
     to: email,
