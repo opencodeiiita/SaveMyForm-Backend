@@ -6,11 +6,11 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
 
-export function getJwt(object){
+export function getJwt(object,expiresIn='30d'){
   const secret = process.env.SECRET; 
   const options = {
     algorithm: 'HS256', // Use HS256 algorithm
-    expiresIn: '30d' // Token expires in one hour
+    expiresIn: expiresIn
   };
 
   // Sign the JWT with the payload, secret key, and options
