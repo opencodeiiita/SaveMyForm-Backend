@@ -28,7 +28,7 @@ export function mailer(subject, email, body, html) {
   });
 }
 
-export function sendVerificationLink(email, secret) {
+export function sendVerificationLink(email, secret, ip) {
   let link = 'http://savemyform.tk/verify/' + secret;
   const handlebarOptions = {
     viewEngine: {
@@ -44,7 +44,8 @@ export function sendVerificationLink(email, secret) {
     subject: 'Email verification link',
     template: 'verification',
     context:{
-        url:link
+        url:link,
+        ip: ip
     }
   };
   transporter.sendMail(mailOptions, (err, info) => {
