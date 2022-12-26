@@ -4,7 +4,7 @@ These are all the endpoints that will be included in this backend project.
 
 The endpoints are divided into 5 categories:
   1. [Auth Endpoints ('/')](#auth-endpoints)
-  2. User Endpoints ('/user')
+  2. [User Endpoints ('/user')](#user-endpoints)
   3. Project Endpoints ('/project')
   4. Form Endpoints ('/form')
   5. Form Submission Endpoints ('/main')
@@ -106,5 +106,44 @@ The following properties of every endpoint will be descibed in this file:
   "email": "test@test.com",
   "verfied": true,
   "secret": "JWT Token"
+}
+```
+
+## User Endpoints
+> *Base URI: `/user`*
+
+### `/raiseverification`
+
+- **Method**: GET
+- **Authorized**: True
+- **Success Status Code:** 200
+- **Response Data:** `Null`
+
+### `/verify/<secret>`
+
+- **Method**: GET
+- **Authorized**: False
+- **Success Status Code:** 200
+- **Response Data:** `Null`
+
+### `/update`
+
+- **Method**: POST
+- **Authorized**: True
+- **Request Parameters:**
+```json
+{
+  "name": "User Name",
+  "email": "test@test.com",
+  "oldPassword": "older One",
+  "newPassword": "newer One // optional"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "name": "User Name",
+  "email": "test@test.com"
 }
 ```
