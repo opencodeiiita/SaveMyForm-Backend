@@ -163,6 +163,9 @@
         <p class="card-text">
           <a href="{url}" style="color: #006dfb">{url}</a>
         </p>
+        <p class="card-text">
+          The verification request was generated on the ip address: {ip}
+        </p>
       </div>
     </div>
   </body>
