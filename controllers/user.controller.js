@@ -1,5 +1,5 @@
-import { sendVerificationLink } from '../utils/mailer';
-import { getJwt } from '../utils/password';
+import { sendVerificationLink } from '../utils/mailer.js';
+import { getJwt } from '../utils/password.js';
 
 export async function getVerificationLink(req,res){
     const payload = {
