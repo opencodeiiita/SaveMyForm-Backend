@@ -1,6 +1,7 @@
 import { sendVerificationLink } from '../utils/mailer.js';
 import { getJwt, hash_password } from '../utils/password.js';
 import { response_200,response_400 } from '../utils/responseCodes.js';
+import validator from 'validator';
 
 export function getVerificationLink(req,res){
     if(req.user.verified) return response_400(res,'The user is already verified')
@@ -21,11 +22,12 @@ export async function updateUser(req,res){
     if(req.user.passwordHash!==''){
         const password = await hash_password(req.body.password)
         if(password!==req.user.passwordHash) return response_400(res,'Wrong Password')
-        if(req.body.name!==req.user.name) req.user.name = req.body.name
         if(req.body.email!==req.user.email){
+            if(!validator.isEmail(req.body.email)) return response_400(res,'Invalid email id')
             req.user.email = req.body.email
             req.user.verified = false
         }
+        if(req.body.name!==req.user.name) req.user.name = req.body.name
         const updatedUser = await req.user.save()
         return response_200(res,'User info updated',{
             name:updatedUser.name,
