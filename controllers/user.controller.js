@@ -17,25 +17,22 @@ export function getVerificationLink(req,res){
 }
 
 export async function updateUser(req,res){
-    if(!(req.body.name && req.body.email && req.body.oldPassword)) return response_400(res,'All required fields not present')
+    if(!(req.body.name && req.body.email && req.body.password)) return response_400(res,'All required fields not present')
     if(req.user.passwordHash!==''){
-        const password = await hash_password(req.body.oldPassword)
-        if(password!=req.user.passwordHash) return response_400(res,'Wrong Password')
+        const password = await hash_password(req.body.password)
+        if(password!==req.user.passwordHash) return response_400(res,'Wrong Password')
+        if(req.body.name!==req.user.name) req.user.name = req.body.name
+        if(req.body.email!==req.user.email){
+            req.user.email = req.body.email
+            req.user.verified = false
+        }
+        const updatedUser = await req.user.save()
+        return response_200(res,'User info updated',{
+            name:updatedUser.name,
+            email:updatedUser.email
+        })
     }
-    if(req.body.newPassword && req.body.newPassword!==''){
-        if(req.body.newPassword.length<6)
-            return response_400(res,'Password length too short')
-        const password = await hash_password(req.body.newPassword)   
-        req.user.passwordHash = password
+    else{
+        return response_400(res,'You will need to create a password before changing these settings')
     }
-    if(req.body.name!==req.user.name) req.user.name = req.body.name
-    if(req.body.email!==req.user.email){
-        req.user.email = req.body.email
-        req.user.verified = false
-    }
-    const updatedUser = await req.user.save()
-    return response_200(res,'User info updated',{
-        name:updatedUser.name,
-        email:updatedUser.email
-    })
 }
