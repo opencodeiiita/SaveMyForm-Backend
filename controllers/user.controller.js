@@ -7,7 +7,7 @@ export function getVerificationLink(req,res){
         name : req.user.name,
         email : req.user.email,
         id : req.user._id,
-        ip : req.socket.remoteAddress
+        ip : req.ip
     }
 
     const token = getJwt(payload,'300s')
