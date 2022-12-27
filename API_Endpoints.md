@@ -5,7 +5,7 @@ These are all the endpoints that will be included in this backend project.
 The endpoints are divided into 5 categories:
   1. [Auth Endpoints ('/')](#auth-endpoints)
   2. [User Endpoints ('/user')](#user-endpoints)
-  3. Project Endpoints ('/project')
+  3. [Project Endpoints ('/project')](#project-endpoints)
   4. Form Endpoints ('/form')
   5. Form Submission Endpoints ('/main')
 
@@ -128,7 +128,7 @@ The following properties of every endpoint will be descibed in this file:
 
 ### `/update`
 
-- **Method**: POST
+- **Method**: PATCH
 - **Authorized**: True
 - **Request Parameters:**
 ```json
@@ -147,3 +147,177 @@ The following properties of every endpoint will be descibed in this file:
   "email": "test@test.com"
 }
 ```
+
+### `/updatepassword`
+
+- **Method**: PATCH
+- **Authorized**: True
+- **Request Parameters:**
+```json
+{
+  "oldPassword": "older One",
+  "newPassword": "newer One",
+  "recaptcha_token": "Google Recaptcha Token recieved from Google"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** `Null`
+
+
+### `/dashboard`
+
+- **Method**: GET
+- **Authorized**: True
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "name": "User's name",
+  "email": "test@test.com",
+  "verified": true || false,
+  "project_count": 2,
+  "projects":[
+    {
+      "name": "Project Name",
+      "form_count": 5,
+      "allowed_origins": ["http://localhost", "https://savemyform.tk"],
+      "date_created": "date-of-creation"
+    }
+  ]
+}
+```
+
+### `/self`
+
+- **Method**: GET
+- **Authorized**: True
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "name": "User's name",
+  "email": "test@test.com",
+  "verified": true || false
+}
+```
+
+
+## Project Endpoints
+> *Base URI: `/project`*
+
+### `/new`
+
+- **Method**: POST
+- **Authorized**: True
+- **Request Parameters:**
+```json
+{
+  "name": "Project Name",
+  "hasRecaptcha": true || false,
+  "recaptchaKey": "User's project Recaptcha Key",
+  "recaptchaSecret": "User's project Recaptcha Secret",
+  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "collaborators": ["test1@test.com", "test2@test.com"],
+  "recaptcha_token": "Google Recaptcha Token recieved from Google"
+}
+```
+- **Success Status Code:** 201
+- **Response Data:** 
+```json
+{
+    "id": "project's id",
+    "name": "project's name"
+}
+```
+
+### `/dashboard/<id>`
+
+- **Method**: GET
+- **Authorized**: True
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "name": "Project's name",
+  "is_owner": true || false,
+  "owner":{
+    "name": "Owner Name",
+    "email": "owner@test.com"
+  },
+  "collaborators": [
+    {
+      "name": "Collab 1",
+      "email": "test1@test.com"
+    }
+  ],
+  "hasRecaptcha": true || false,
+  "recaptchaKey": "User's project Recaptcha Key",
+  "recaptchaSecret": "User's project Recaptcha Secret",
+  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "form_count": 2,
+  "forms":[
+    {
+      "name": "Form Name",
+      "submission_count": 5,
+      "last_submission": "date-of-last-submission",
+      "date_created": "date-of-creation"
+    }
+  ]
+}
+```
+
+
+### `/update/<id>`
+
+- **Method**: PATCH
+- **Authorized**: True
+- **Request Parameters:**
+```json
+{
+  "name": "Project Name",
+  "hasRecaptcha": true || false,
+  "recaptchaKey": "User's project Recaptcha Key",
+  "recaptchaSecret": "User's project Recaptcha Secret",
+  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "collaborators": ["test1@test.com", "test2@test.com"],
+  "recaptcha_token": "Google Recaptcha Token recieved from Google",
+  "password": "user's password"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  
+  "name": "Project's name",
+  "is_owner": true || false,
+  "owner":{
+    "name": "Owner Name",
+    "email": "owner@test.com"
+  },
+  "collaborators": [
+    {
+      "name": "Collab 1",
+      "email": "test1@test.com"
+    }
+  ],
+  "hasRecaptcha": true || false,
+  "recaptchaKey": "User's project Recaptcha Key",
+  "recaptchaSecret": "User's project Recaptcha Secret",
+  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+}
+```
+
+### `/delete/<id>`
+
+- **Method**: DELETE
+- **Authorized**: True
+- **Request Parameters:**
+```json
+{
+  "recaptcha_token": "Google Recaptcha Token recieved from Google",
+  "password": "user's password"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** `Null`
