@@ -29,7 +29,7 @@ export async function logIn(req, res) {
     return response_200(res, 'Log In Succesful', {
       name: checkUser.name,
       email: email,
-      verfied: checkUser.verfied,
+      verified: checkUser.verified,
       secret: jwtToken,
     });
   } catch (error) {
@@ -65,7 +65,7 @@ export async function signUp(req, res) {
     return response_201(res, 'Sign Up Succesful', {
       name,
       email,
-      verfied: newUser.verified,
+      verified: newUser.verified,
       secret: jwtToken,
     });
   } catch (error) {
@@ -88,7 +88,7 @@ export async function authGoogle(req,res) {
       return response_200(res, 'Log In Succesful', {
         name: checkUser.name,
         email: email,
-        verfied: checkUser.verfied,
+        verified: checkUser.verified,
         secret: jwtToken,
       })
     }

@@ -14,7 +14,7 @@ const userSchema = new Schema({
     passwordHash:{
         type: String
     },
-    verfied:{
+    verified:{
         type: Boolean,
         default: false
     },
