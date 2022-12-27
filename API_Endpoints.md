@@ -135,7 +135,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User Name",
   "email": "test@test.com",
-  "oldPassword": "older One",
+  "password": "older One",
 }
 ```
 - **Success Status Code:** 200
