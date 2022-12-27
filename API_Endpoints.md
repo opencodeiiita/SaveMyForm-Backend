@@ -109,6 +109,8 @@ The following properties of every endpoint will be descibed in this file:
 }
 ```
 
+---
+
 ## User Endpoints
 > *Base URI: `/user`*
 
@@ -174,7 +176,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User's name",
   "email": "test@test.com",
-  "verified": true || false,
+  "verified": true,
   "project_count": 2,
   "projects":[
     {
@@ -197,10 +199,11 @@ The following properties of every endpoint will be descibed in this file:
 {
   "name": "User's name",
   "email": "test@test.com",
-  "verified": true || false
+  "verified": true
 }
 ```
 
+---
 
 ## Project Endpoints
 > *Base URI: `/project`*
@@ -213,7 +216,7 @@ The following properties of every endpoint will be descibed in this file:
 ```json
 {
   "name": "Project Name",
-  "hasRecaptcha": true || false,
+  "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
   "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
@@ -239,7 +242,7 @@ The following properties of every endpoint will be descibed in this file:
 ```json
 {
   "name": "Project's name",
-  "is_owner": true || false,
+  "is_owner": true,
   "owner":{
     "name": "Owner Name",
     "email": "owner@test.com"
@@ -250,7 +253,7 @@ The following properties of every endpoint will be descibed in this file:
       "email": "test1@test.com"
     }
   ],
-  "hasRecaptcha": true || false,
+  "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
   "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
@@ -275,7 +278,7 @@ The following properties of every endpoint will be descibed in this file:
 ```json
 {
   "name": "Project Name",
-  "hasRecaptcha": true || false,
+  "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
   "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
@@ -290,7 +293,7 @@ The following properties of every endpoint will be descibed in this file:
 {
   
   "name": "Project's name",
-  "is_owner": true || false,
+  "is_owner": true,
   "owner":{
     "name": "Owner Name",
     "email": "owner@test.com"
@@ -301,7 +304,7 @@ The following properties of every endpoint will be descibed in this file:
       "email": "test1@test.com"
     }
   ],
-  "hasRecaptcha": true || false,
+  "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
   "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
