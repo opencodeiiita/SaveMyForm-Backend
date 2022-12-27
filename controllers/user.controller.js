@@ -1,6 +1,7 @@
 import { sendVerificationLink } from '../utils/mailer.js';
 import { getJwt, hash_password } from '../utils/password.js';
 import { response_200,response_400 } from '../utils/responseCodes.js';
+import verifycaptcha from '../utils/recaptcha.js';
 import validator from 'validator';
 
 export function getVerificationLink(req,res){
@@ -20,6 +21,7 @@ export function getVerificationLink(req,res){
 export async function updateUser(req,res){
     if(!(req.body.name && req.body.email && req.body.password)) return response_400(res,'All required fields not present')
     if(req.user.passwordHash!==''){
+        if(!verifycaptcha(req.body.recaptcha_token)) return response_400(res,'Captcha not verified')
         const password = await hash_password(req.body.password)
         if(password!==req.user.passwordHash) return response_400(res,'Wrong Password')
         if(req.body.email!==req.user.email){
