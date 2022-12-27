@@ -40,3 +40,19 @@ export async function updateUser(req,res){
         return response_400(res,'You will need to create a password before changing these settings')
     }
 }
+
+export async function updatePassword(req,res){
+    if(!(req.body.oldPassword && req.body.newPassword)) return response_400(res,'All request parameters not provided')
+    if(!verifycaptcha(req.body.recaptcha_token)) return response_400(res,'Captcha not verified')
+    if(req.user.passwordHash!==''){
+        const password = await hash_password(req.body.oldPassword)
+        if(password!==req.user.passwordHash) return response_400(res,'Wrong Password')
+        if(req.body.newPassword.length<6) return response_400(res,'New password length too short')
+        req.user.passwordHash = await hash_password(req.body.newPassword)
+        await req.user.save();
+        return response_200(res,'Password updated')
+    }
+    else{
+        return response_400(res,'You will need to create a password before changing these settings')
+    }
+}
