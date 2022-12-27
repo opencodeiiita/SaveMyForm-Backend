@@ -1,7 +1,8 @@
 import { sendVerificationLink } from '../utils/mailer.js';
 import { getJwt } from '../utils/password.js';
 
-export async function getVerificationLink(req,res){
+export function getVerificationLink(req,res){
+    if(req.user.verified) return;
     const payload = {
         name : req.user.name,
         email : req.user.email,
