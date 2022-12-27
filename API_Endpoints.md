@@ -136,6 +136,7 @@ The following properties of every endpoint will be descibed in this file:
   "name": "User Name",
   "email": "test@test.com",
   "password": "older One",
+  "recaptcha_token": "Google Recaptcha Token recieved from Google"
 }
 ```
 - **Success Status Code:** 200
