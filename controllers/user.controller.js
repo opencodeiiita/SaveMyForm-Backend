@@ -3,6 +3,8 @@ import { getJwt, hash_password } from '../utils/password.js';
 import { response_200,response_400 } from '../utils/responseCodes.js';
 import verifycaptcha from '../utils/recaptcha.js';
 import validator from 'validator';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
 
 export function getVerificationLink(req,res){
     if(req.user.verified) return response_400(res,'The user is already verified')
@@ -54,5 +56,35 @@ export async function updatePassword(req,res){
     }
     else{
         return response_400(res,'You will need to create a password before changing these settings')
+    }
+}
+
+export async function verifySecret(req, res) {
+    try {
+        // extract JWT secret from params
+        const secret = req.params.secret;
+
+        // verify the secret
+        const { payload } = jwt.verify(secret, process.env.SECRET); // will throw err is token is invalid or expired
+
+        const userMongoId = payload.id;
+
+        // extract user info from DB
+        const user = await User.findById(userMongoId);
+
+        if (!user) {
+            // user is not present in DB
+            throw new Error();
+        }
+
+        // marking the user as verified
+        user.verified = true;
+        await user.save();
+
+        response_200(res, "User verified");
+    }
+    catch (err) {
+        console.log(err);
+        response_400(res, "Request is invalid")
     }
 }
