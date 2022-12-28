@@ -88,3 +88,11 @@ export async function verifySecret(req, res) {
         response_400(res, "Request is invalid")
     }
 }
+
+export async function getUser(req,res){
+    return response_200(res,'User data',{
+        name: req.user.name,
+        email: req.user.email,
+        verified: req.user.verified
+    })
+}
