@@ -96,3 +96,28 @@ export async function getUser(req,res){
         verified: req.user.verified
     })
 }
+
+export async function dashboard(req, res) {
+    try {
+      const user = req.user;
+      user = user
+        .populate({
+          path: 'projects',
+          options: { sort: { createdAt: -1 } },
+          select: 'id name forms allowed_origins createdAt',
+        })
+        .aggregate([
+          { $addFields: { project_count: { $count: '$projects' } } },
+          { $addFields: { form_count: { $count: '$forms' } } },
+        ])
+        .select('name email verified project_count projects');
+  
+      return response_200(
+        res,
+        'Sent required user data to dashboard',
+        user.select('name email verified project_count projects'),
+      );
+    } catch (err) {
+      console.log(err);
+    }
+}
