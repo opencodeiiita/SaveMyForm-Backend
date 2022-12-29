@@ -6,6 +6,5 @@ const router = Router();
 
 // All routes configured here
 router.get('/', greet);
-router.get('/dashboard', authMiddleware, dashboard);
 
 export default router;
