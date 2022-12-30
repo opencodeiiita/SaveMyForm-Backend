@@ -8,12 +8,12 @@ export async function createProject(req,res){
     const newProject = Project({
         name: req.body.name,
         owner: req.user._id,
-        collaborators: req.body.collaborators,
-        allowedOrigins: req.body.allowedOrigins,
-        reCaptchaKey: req.body.reCaptchaKey,
-        reCaptchaSecret: req.body.reCaptchaSecret,
-        allowRecaptcha: req.body.hasRecaptcha
     })
+    if(req.body.collaborators) newProject.collaborators = req.body.collaborators
+    if(req.body.allowedOrigins) newProject.allowedOrigins = req.body.allowedOrigins
+    if(req.body.reCaptchaKey) newProject.reCaptchaKey = req.body.reCaptchaKey
+    if(req.body.reCaptchaSecret) newProject.reCaptchaSecret = req.body.reCaptchaSecret
+    if(req.body.hasRecaptcha) newProject.allowRecaptcha = req.body.hasRecaptcha
     try{
         await newProject.save()
         return response_201(res,'Project created',{
