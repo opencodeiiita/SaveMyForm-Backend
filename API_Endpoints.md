@@ -31,6 +31,7 @@ An error response from the server will look like this:
 The following properties of every endpoint will be descibed in this file:
   * **Method:** *GET | POST | PATCH | DELETE*
   * **Authorized:** *(Authentication is required or not for this route) True | False*
+  * **Verified:** *(Account with Email verified is required or not for this route) True | False*
   * **Request Parameters:** *(Requet-Body to be sent along with the request, for POST | PATCH | DELETE methods)*
   * **Query Parameters:** *(Query Parameters available in GET requests to manipulate the response from the server)*
   * **Success Status Code:** *(Status Code of a successful response) 2xx*
@@ -45,6 +46,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: POST
 - **Authorized**: False
+- **Verified**: False
 - **Request Parameters:**
 ```json
 {
@@ -68,6 +70,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: POST
 - **Authorized**: False
+- **Verified**: False
 - **Request Parameters:**
 ```json
 {
@@ -92,6 +95,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: POST
 - **Authorized**: False
+- **Verified**: False
 - **Request Parameters:**
 ```json
 {
@@ -118,6 +122,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: GET
 - **Authorized**: True
+- **Verified**: False
 - **Success Status Code:** 200
 - **Response Data:** `Null`
 
@@ -125,6 +130,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: GET
 - **Authorized**: False
+- **Verified**: False
 - **Success Status Code:** 200
 - **Response Data:** `Null`
 
@@ -132,6 +138,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: PATCH
 - **Authorized**: True
+- **Verified**: True
 - **Request Parameters:**
 ```json
 {
@@ -154,6 +161,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: PATCH
 - **Authorized**: True
+- **Verified**: False
 - **Request Parameters:**
 ```json
 {
@@ -170,6 +178,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: GET
 - **Authorized**: True
+- **Verified**: True
 - **Success Status Code:** 200
 - **Response Data:** 
 ```json
@@ -194,6 +203,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: GET
 - **Authorized**: True
+- **Verified**: False
 - **Success Status Code:** 200
 - **Response Data:** 
 ```json
@@ -213,6 +223,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: POST
 - **Authorized**: True
+- **Verified**: True
 - **Request Parameters:**
 ```json
 {
@@ -238,6 +249,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: GET
 - **Authorized**: True
+- **Verified**: True
 - **Success Status Code:** 200
 - **Response Data:** 
 ```json
@@ -275,6 +287,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: PATCH
 - **Authorized**: True
+- **Verified**: True
 - **Request Parameters:**
 ```json
 {
@@ -316,6 +329,7 @@ The following properties of every endpoint will be descibed in this file:
 
 - **Method**: DELETE
 - **Authorized**: True
+- **Verified**: True
 - **Request Parameters:**
 ```json
 {
