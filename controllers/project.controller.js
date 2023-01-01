@@ -46,3 +46,45 @@ export async function deleteProject(req, res) {
   Project.deleteOne({ id: project.id });
   response_200(res, 'The project has been succesfully deleted.');
 }
+
+export async function projectDashboard(req,res){
+  const project = await Project.findById(req.params.id)
+  if(!project) return response_400(res,'No project with this id')
+  let allow = project.collaborators.includes(req.user._id)
+  if(!allow && project.owner!==req.user._id) return response_400(res,'You cannot access this project')
+  try{
+      project = project.populate('forms','name submissions createdAt updatedAt')
+      .populate('owner','name email')
+      .populate('collaborators','name email')
+      .aggregate()
+      .project({
+          _id: 0,
+          name: 1,
+          owner: 1,
+          collaborators: 1,
+          hasRecaptcha: 1,
+          recaptchaKey: 1,
+          recaptchaSecret: 1,
+          allowedOrigins: 1,
+          is_owner: { $eq : ['$$owner._id',req.user._id] },
+          form_count: { $count : '$forms'},
+          forms:{
+              $map: {
+                  input: '$forms',
+                  as: 'forms',
+                  in: {
+                      name: '$$forms.name',
+                      createdAt: '$$forms.createdAt',
+                      submission_count: { $count : '$$forms.submissions'},
+                      last_updated: '$$forms.updatedAt',
+                      submissions: 0
+                  }
+              }
+          }
+      })
+      return response_200(res,'Project Dashboard',project)
+  }
+  catch(error){
+      return response_500(res,'Server error',error)
+  }
+}
