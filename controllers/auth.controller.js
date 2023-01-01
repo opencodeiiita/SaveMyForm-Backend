@@ -10,11 +10,18 @@ import User from '../models/user.model.js';
 import verifycaptcha from '../utils/recaptcha.js';
 import validator from 'validator';
 import { OAuth2Client } from 'google-auth-library';
-const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
+const client = new OAuth2Client(
+  process.env.GOOGLE_OAUTH_CLIENT_ID,
+  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+  process.env.ENV === 'prod'
+    ? 'https://savemyform.tk/signin/oauth'
+    : 'http://localhost:3000/signin/oauth',
+);
 
 export async function logIn(req, res) {
   const { email, recaptcha_token } = req.body;
-  if(!(email && recaptcha_token && req.body.password)) return response_400(res, 'Some parameters are missing!')
+  if (!(email && recaptcha_token && req.body.password))
+    return response_400(res, 'Some parameters are missing!');
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha was found incorrect!');
   const password = await hash_password(req.body.password);
@@ -24,7 +31,11 @@ export async function logIn(req, res) {
     if (!checkUser) return response_404(res, "User Doesn't exist");
     const checkPassword = password === checkUser.passwordHash;
     if (!checkPassword) return response_400(res, 'Password is incorrect');
-    if(checkUser.passwordHash === "") return response_400(res, 'Account created using Google Auth, either change your password or Signin with Google');
+    if (checkUser.passwordHash === '')
+      return response_400(
+        res,
+        'Account created using Google Auth, either change your password or Signin with Google',
+      );
     const jwtToken = getJwt({ id: checkUser._id, email: email });
     return response_200(res, 'Log In Succesful', {
       name: checkUser.name,
@@ -44,7 +55,8 @@ export function greet(req, res) {
 
 export async function signUp(req, res) {
   const { name, email, recaptcha_token } = req.body;
-  if(!(name && email && recaptcha_token && req.body.password)) return response_400(res, 'Some parameters are missing!')
+  if (!(name && email && recaptcha_token && req.body.password))
+    return response_400(res, 'Some parameters are missing!');
   if (req.body.password.length < 6)
     return response_400(res, 'Password must be longer than 6 letters');
   if (!validator.isEmail(email)) return response_400(res, 'Email is invalid');
@@ -73,27 +85,26 @@ export async function signUp(req, res) {
   }
 }
 
-export async function authGoogle(req,res) {
-  const { token }  = req.body
-  if(!(token)) return response_400(res, 'The token is missing!')
+export async function authGoogle(req, res) {
+  const { token } = req.body;
+  if (!token) return response_400(res, 'The token is missing!');
   const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_OAUTH_CLIENT_ID
+    idToken: token,
+    audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
   });
-  const { name, email } = ticket.getPayload(); 
-  try{
+  const { name, email } = ticket.getPayload();
+  try {
     const checkUser = await User.exists({ email });
-    if(checkUser){
+    if (checkUser) {
       const jwtToken = getJwt({ id: checkUser._id, email: email });
       return response_200(res, 'Log In Succesful', {
         name: checkUser.name,
         email: email,
         verified: checkUser.verified,
         secret: jwtToken,
-      })
-    }
-    else{
-      const password = ''
+      });
+    } else {
+      const password = '';
       let newUser = User({
         email,
         name,
@@ -109,8 +120,15 @@ export async function authGoogle(req,res) {
         secret: jwtToken,
       });
     }
-  }
-  catch(error){
+  } catch (error) {
     return response_500(res, 'Internal server error', error);
   }
+}
+
+export async function getGoogleAuthUrl(req, res) {
+  const url = client.generateAuthUrl({
+    access_type: 'online',
+    scope: ['profile', 'email'],
+  });
+  return response_200(res, 'Success', { url });
 }
