@@ -36,7 +36,6 @@ export async function projectDashboard(req,res){
         .project({
             _id: 0,
             name: 1,
-            is_owner: 1,
             owner: 1,
             collaborators: 1,
             hasRecaptcha: 1,
