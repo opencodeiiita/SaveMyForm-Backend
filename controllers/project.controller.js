@@ -32,17 +32,6 @@ export async function projectDashboard(req,res){
     let allow = project.collaborators.includes(req.user._id)
     if(!allow && project.owner!==req.user._id) return response_400(res,'You cannot access this project')
     try{
-        project.is_owner = false
-        if(project.owner === req.user._id) project.is_owner = true
-        project.populate('owner','name email').exec((err,owner)=>{
-            if(err) throw new Error()
-            project.owner = owner
-        })
-        project.populate('collaborators','name email').exec((err,collabs)=>{
-            if(err) throw new Error()
-            project.collaborators = collabs
-        })
-        project.form_count = project.forms.length
         project = project.populate('forms','name submissions createdAt').aggregate()
         .project({
             _id: 0,
@@ -54,6 +43,8 @@ export async function projectDashboard(req,res){
             recaptchaKey: 1,
             recaptchaSecret: 1,
             allowedOrigins: 1,
+            is_owner: { $eq : ['$owner','$req.user._id'] },
+            form_count: { $count : '$forms'},
             forms:{
                 $map: {
                     input: '$forms',
@@ -89,6 +80,14 @@ export async function projectDashboard(req,res){
                 submissions: 0
             })
         }
+        project.populate('owner','name email').exec((err,owner)=>{
+            if(err) throw new Error()
+            project.owner = owner
+        })
+        project.populate('collaborators','name email').exec((err,collabs)=>{
+            if(err) throw new Error()
+            project.collaborators = collabs
+        })
         return response_200(res,'Project Dashboard',project)
     }
     catch(error){
