@@ -7,9 +7,6 @@ import {
 } from '../utils/responseCodes.js';
 import User from '../models/user.model.js';
 
-<<<<<<< HEAD
-const verifyMiddleware = async (req, res, next) => {
-=======
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
@@ -24,7 +21,6 @@ const authMiddleware = async (req, res, next) => {
 
     let userMongoId;
 
->>>>>>> 219dc7e4f8c80ef1ce97ddba1608ea89f76e84c7
     try {
       const { payload } = jwt.verify(authToken, process.env.SECRET); // will throw err is token is invalid or expired
       req.isAuthenticated = true;
@@ -37,9 +33,6 @@ const authMiddleware = async (req, res, next) => {
     // extracting user info from DB
     const user = await User.findById(userMongoId);
 
-<<<<<<< HEAD
-export default verifyMiddleware;
-=======
     if (!user || !user.verified) {
       // user is not present in DB
       return response_401(res, 'Request is unauthorized');
@@ -53,4 +46,3 @@ export default verifyMiddleware;
 };
 
 export default authMiddleware;
->>>>>>> 219dc7e4f8c80ef1ce97ddba1608ea89f76e84c7
