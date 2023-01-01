@@ -42,7 +42,7 @@ export async function projectDashboard(req,res){
             recaptchaKey: 1,
             recaptchaSecret: 1,
             allowedOrigins: 1,
-            is_owner: { $eq : ['$owner','$req.user._id'] },
+            is_owner: { $eq : ['$owner',req.user._id] },
             form_count: { $count : '$forms'},
             forms:{
                 $map: {
