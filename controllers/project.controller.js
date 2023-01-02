@@ -56,9 +56,9 @@ export async function updateProject(req, res) {
     }
 
     const projectId = req.params.projectId;
-    const initialProject = await Project.findById(projectId);
+    const { ownerId } = await Project.findById(projectId, "-_id owner");
 
-    if (req.user.id !== initialProject.owner) {
+    if (req.user.id !== ownerId) {
       // current user is not the owner of the project
       response_401('The user is not the owner of project.')
     }
@@ -86,31 +86,24 @@ export async function updateProject(req, res) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
     if (req.body.collaborators) {
-      updatedProject.collaborators = collaboratorsDetail;
+      updatedProject.collaborators = req.body.collaborators;
     }
 
     // updating the project details in DB
-    const finalProject = await Project.findByIdAndUpdate(projectId, updatedProject, { returnDocument: "after" });
+    const finalProject = await Project.findByIdAndUpdate(projectId, updatedProject, { returnDocument: "after", select: "-_id -id -forms" });
 
     // sending back the updated project details
-    const ownerDetails = await User.findById(finalProject.owner, "name email");
-    const collaboratorsDetail = await Promise.all(finalProject.collaborators.map(async collaboratorId => {
-      const collaboratorDetail = await User.findById(collaboratorId, "name email");
-      return {
-        name: collaboratorDetail.name,
-        email: collaboratorDetail.email
-      }
-    }))
-    response_200(res, "Project upodated", {
-      name: finalProject.name,
-      is_owner: req.user.id === finalProject.owner,
-      owner: { name: ownerDetails.name, email: ownerDetails.email },
-      collaborators: collaboratorsDetail,
-      hasRecaptcha: finalProject.allowRecaptcha,
-      recaptchaKey: finalProject.reCaptchaKey,
-      recaptchaSecret: finalProject.reCaptchaSecret,
-      allowedOrigins: finalProject.allowedOrigins
-    });
+    const ownerDetails = await User.findById(finalProject.owner, "-_id name email");
+    finalProject.owner = ownerDetails;
+
+    const collaboratorsDetail = await Promise.all(finalProject.collaborators.map(
+      async collaboratorId => await User.findById(collaboratorId, "-_id name email")
+    ))
+    finalProject.collaborators = collaboratorsDetail;
+
+    finalProject.is_owner = req.user.id === finalProject.owner;
+
+    response_200(res, "Project updated", finalProject);
   }
   catch (err) {
     response_500("Something went wrong, please try again.");
