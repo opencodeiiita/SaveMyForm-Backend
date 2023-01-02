@@ -90,16 +90,9 @@ export async function updateProject(req, res) {
     }
 
     // updating the project details in DB
-    const finalProject = await Project.findByIdAndUpdate(projectId, updatedProject, { returnDocument: "after", select: "-_id -id -forms" });
-
-    // sending back the updated project details
-    const ownerDetails = await User.findById(finalProject.owner, "-_id name email");
-    finalProject.owner = ownerDetails;
-
-    const collaboratorsDetail = await Promise.all(finalProject.collaborators.map(
-      async collaboratorId => await User.findById(collaboratorId, "-_id name email")
-    ))
-    finalProject.collaborators = collaboratorsDetail;
+    const finalProject = await Project.findByIdAndUpdate(projectId, updatedProject, { returnDocument: "after", select: "-_id -forms" })
+      .populate({ path: "owner", select: "-_id name email" })
+      .populate({ path: "collaborators", select: "-_id name email" });
 
     finalProject.is_owner = req.user.id === finalProject.owner;
 
