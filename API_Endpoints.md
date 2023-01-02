@@ -93,6 +93,19 @@ The following properties of every endpoint will be descibed in this file:
 
 #### `/auth/google`
 
+- **Method**: GET
+- **Authorized**: False
+- **Verified**: False
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "url": "Google OAuth URL"
+}
+```
+
+#### `/auth/google`
+
 - **Method**: POST
 - **Authorized**: False
 - **Verified**: False
@@ -275,7 +288,7 @@ The following properties of every endpoint will be descibed in this file:
     {
       "name": "Form Name",
       "submission_count": 5,
-      "last_submission": "date-of-last-submission",
+      "last_updated": "date-of-last-submission",
       "date_created": "date-of-creation"
     }
   ]
