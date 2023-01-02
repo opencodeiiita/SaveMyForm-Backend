@@ -88,12 +88,13 @@ export async function signUp(req, res) {
 export async function authGoogle(req, res) {
   const { token } = req.body;
   if (!token) return response_400(res, 'The token is missing!');
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
-  });
-  const { name, email } = ticket.getPayload();
   try {
+    let idtoken = await client.getToken(token);
+    const ticket = await client.verifyIdToken({
+      idToken: idtoken.tokens.id_token,
+      audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
+    });
+    const { name, email } = ticket.getPayload();
     const checkUser = await User.exists({ email });
     if (checkUser) {
       const jwtToken = getJwt({ id: checkUser._id, email: email });
