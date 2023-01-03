@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+let bucket;
 
 export default function connDB() {
   mongoose.set('strictQuery', true);
@@ -9,5 +10,9 @@ export default function connDB() {
     })
     .then(() => {
       console.log('connected to db');
+      const db = mongoose.connections[0].db
+      bucket = new mongoose.mongo.GridFSBucket(db, {
+        bucketName: "uploads"
+      });
     });
 }
