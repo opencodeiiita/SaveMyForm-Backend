@@ -6,7 +6,7 @@ The endpoints are divided into 5 categories:
   1. [Auth Endpoints ('/')](#auth-endpoints)
   2. [User Endpoints ('/user')](#user-endpoints)
   3. [Project Endpoints ('/project')](#project-endpoints)
-  4. Form Endpoints ('/form')
+  4. [Form Endpoints ('/form')](#form-endpoints)
   5. Form Submission Endpoints ('/main')
 
 A successful response from the server will look like this:
@@ -267,6 +267,7 @@ The following properties of every endpoint will be descibed in this file:
 - **Response Data:** 
 ```json
 {
+  "id": "Project ID",
   "name": "Project's name",
   "is_owner": true,
   "owner":{
@@ -288,7 +289,7 @@ The following properties of every endpoint will be descibed in this file:
     {
       "name": "Form Name",
       "submission_count": 5,
-      "last_submission": "date-of-last-submission",
+      "last_updated": "date-of-last-submission",
       "date_created": "date-of-creation"
     }
   ]
@@ -318,7 +319,7 @@ The following properties of every endpoint will be descibed in this file:
 - **Response Data:** 
 ```json
 {
-  
+  "id": "Project ID"
   "name": "Project's name",
   "is_owner": true,
   "owner":{
@@ -335,6 +336,126 @@ The following properties of every endpoint will be descibed in this file:
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
   "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+}
+```
+
+### `/delete/<id>`
+
+- **Method**: DELETE
+- **Authorized**: True
+- **Verified**: True
+- **Request Parameters:**
+```json
+{
+  "recaptcha_token": "Google Recaptcha Token recieved from Google",
+  "password": "user's password"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** `Null`
+
+---
+
+## Form Endpoints
+> *Base URI: `/form`*
+
+### `/new/<projectId>`
+
+- **Method**: POST
+- **Authorized**: True
+- **Verified**: True
+- **Request Parameters:**
+```json
+{
+  "name": "Form Name",
+  "hasRecaptcha": true,
+  "hasFileField": false,
+  "schema": {"schema": "object"}
+  "recaptcha_token": "Google Recaptcha Token recieved from Google"
+}
+```
+- **Success Status Code:** 201
+- **Response Data:** 
+```json
+{
+    "id": "form's id",
+    "name": "form's name"
+}
+```
+
+### `/dashboard/<id>`
+
+- **Method**: GET
+- **Authorized**: True
+- **Verified**: True
+- **Query Parameters**: 
+```json
+{
+  "sort": "ascending/descending",
+  "page": 5,
+  "perpage": 10
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "id": "Form's ID"
+  "name": "Form's name",
+  "is_owner": true,
+  "owner":{
+    "name": "Owner Name",
+    "email": "owner@test.com"
+  },
+  "hasRecaptcha": true,
+  "submissions":{
+    "total": 999,
+    "page": 2,
+    "per_page": 10,
+    "has_next_page": true,
+    "has_prev_page": true,
+    "total_pages": 100,
+    "data":[
+      {
+        "id": "Submission ID",
+        "data": {"submitted": "data"},
+        "file": "link to file",
+        "date_created": "date-of-creation"
+      }
+    ]
+  }
+}
+```
+
+
+### `/update/<id>`
+
+- **Method**: PATCH
+- **Authorized**: True
+- **Verified**: True
+- **Request Parameters:**
+```json
+{
+  "name": "Form Name",
+  "hasRecaptcha": true,
+  "hasFileField": false,
+  "schema": {"schema": "object"}
+  "password": "user's password",
+  "recaptcha_token": "Google Recaptcha Token recieved from Google"
+}
+```
+- **Success Status Code:** 200
+- **Response Data:** 
+```json
+{
+  "id": "Form's Id"
+  "name": "Form's name",
+  "is_owner": true,
+  "owner":{
+    "name": "Owner Name",
+    "email": "owner@test.com"
+  },
+  "hasRecaptcha": true
 }
 ```
 

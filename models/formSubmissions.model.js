@@ -24,7 +24,7 @@ const formSubmissionSchema = new Schema({
     },
     data : Object,
     file : {
-        type : Buffer,
+        type : Schema.Types.ObjectId,
     },
     
 }, { timestamps: true });
