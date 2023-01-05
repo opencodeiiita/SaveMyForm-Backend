@@ -63,8 +63,10 @@ export async function updateForm(req, res) {
 export async function createForm(req,res){
     if(!verifycaptcha(req.body.recaptcha_token)) return response_400(res,'Captcha not verified')
     if((!req.body.name || !req.body.schema || req.body.hasFileField===undefined || req.body.hasRecaptcha===undefined)) return response_400(res,'All request parameters not present')
+    if(req.body.name==='') return response_400(res,'Name cannot be an empty string')
     const projectId = req.params.projectId
     const project = await Project.findById(projectId)
+    if(!project) return response_400(res,'No project found with this id')
     if(req.user._id!==project.owner) return response_400(res,'Only the owner can create new form')
     try{
         const newForm = Form({
