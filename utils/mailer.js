@@ -32,21 +32,21 @@ export function sendVerificationLink(email, secret, ip) {
   let link = 'http://savemyform.tk/verify/' + secret;
   const handlebarOptions = {
     viewEngine: {
-        partialsDir: path.resolve('../templates/'),
-        defaultLayout: false,
+      partialsDir: path.resolve('../templates/'),
+      defaultLayout: false,
     },
     viewPath: path.resolve('../templates/'),
-};
-  transporter.use('compile',hbs(handlebarOptions))
+  };
+  transporter.use('compile', hbs(handlebarOptions));
   var mailOptions = {
     from: process.env.MAIL_ADDRESS,
     to: email,
     subject: 'Email verification link',
     template: 'verification',
-    context:{
-        url:link,
-        ip: ip
-    }
+    context: {
+      url: link,
+      ip: ip,
+    },
   };
   transporter.sendMail(mailOptions, (err, info) => {
     if (err) {
@@ -55,4 +55,14 @@ export function sendVerificationLink(email, secret, ip) {
       console.log('Email sent: ' + info.response);
     }
   });
+}
+
+export function sendCollabInvitationLink(
+  email,
+  secret,
+  projectName,
+  userName,
+  userEmail,
+) {
+  let link = 'http://savemyform.tk/collab/' + secret;
 }
