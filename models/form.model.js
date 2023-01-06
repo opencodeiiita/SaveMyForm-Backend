@@ -1,36 +1,52 @@
 import { Schema, model } from 'mongoose';
 
-const formSchema = new Schema({
+function generate(len) {
+  const characters = 'abcdefghijklmnopqrstuvwxyz';
+  let result = ' ';
+  const charactersLength = characters.length;
+  for (let i = 0; i < len; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+const formSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     id: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
+      default: generate(16),
     },
     project: {
-        type: Schema.Types.ObjectId,
-        ref: 'project',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: 'project',
+      required: true,
     },
     schema: {
-        type: Schema.Types.Mixed,
-        required: true
+      type: Schema.Types.Mixed,
+      required: true,
     },
     hasFileField: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
-    submissions: [{
+    submissions: [
+      {
         type: Schema.Types.ObjectId,
-        ref:'formSubmission'
-    }],
+        ref: 'formSubmission',
+      },
+    ],
     hasRecaptchaVerification: {
-        type: Boolean,
-        default: false
-    }
-}, { timestamps: true });
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true },
+);
 
 const Form = model('form', formSchema);
 
