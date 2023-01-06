@@ -65,4 +65,31 @@ export function sendCollabInvitationLink(
   userEmail,
 ) {
   let link = 'http://savemyform.tk/collab/' + secret;
+  const handlebarOptions = {
+    viewEngine: {
+      partialsDir: path.resolve('../templates/'),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve('../templates/'),
+  };
+  transporter.use('compile', hbs(handlebarOptions));
+  var mailOptions = {
+    from: process.env.MAIL_ADDRESS,
+    to: email,
+    subject: 'Collaboration invitation link',
+    template: 'collaborator',
+    context: {
+      url: link,
+      projectName,
+      userName,
+      userEmail
+    },
+  };
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 }
