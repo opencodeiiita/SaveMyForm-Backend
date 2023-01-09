@@ -122,10 +122,24 @@ export async function dashboard(req, res) {
     //
     response_401(res, 'UnAuthorised');
 
+    const sort={}
+    if(req.query.sort){
+        const parts = req.query.sort.split(':')
+        sort[parts[0]] = (parts[1]==='desc'? -1 : 1)
+    }
+    let perpage = parseInt(req.query.perpage);
+    let page = parseInt(req.query.page)
+
   form = await form
     .populate({
       path: 'submissions',
       select: 'id data file createdAt',
+      perDocumentLimit: perpage,
+      options:{
+        // limit: parseInt(req.query.perpage),
+        skip: page*perpage,
+        sort
+      },
     })
     .project({
       id: '$id',
