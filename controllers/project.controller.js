@@ -1,5 +1,6 @@
 import Project from '../models/project.model.js';
-// import User from "../models/user.model.js";
+import User from '../models/user.model.js';
+import Form from '../models/form.model.js';
 import verifycaptcha from '../utils/recaptcha.js';
 import {
   response_200,
@@ -107,42 +108,34 @@ export async function updateProject(req, res) {
 }
 
 export async function projectDashboard(req, res) {
-  const project = await Project.findById(req.params.id);
+  let project = await Project.findOne({ projectId: req.params.id });
   if (!project) return response_400(res, 'No project with this id');
   let allow = project.collaborators.includes(req.user._id);
   if (!allow && project.owner !== req.user._id)
     return response_400(res, 'You cannot access this project');
+
   try {
-    project = project
-      .populate('forms', 'name submissions createdAt updatedAt')
+    project = await Project.findOne({ id: req.params.id })
+      .populate('forms', 'name submissions createdAt updatedAt -_id')
       .populate('owner', 'name email')
-      .populate('collaborators', 'name email')
-      .aggregate()
-      .project({
-        _id: 0,
-        name: 1,
-        owner: 1,
-        collaborators: 1,
-        hasRecaptcha: 1,
-        recaptchaKey: 1,
-        recaptchaSecret: 1,
-        allowedOrigins: 1,
-        is_owner: { $eq: ['$$owner._id', req.user._id] },
-        form_count: { $count: '$forms' },
-        forms: {
-          $map: {
-            input: '$forms',
-            as: 'forms',
-            in: {
-              name: '$$forms.name',
-              createdAt: '$$forms.createdAt',
-              submission_count: { $count: '$$forms.submissions' },
-              last_updated: '$$forms.updatedAt',
-              submissions: 0,
-            },
-          },
-        },
-      });
+      .populate('collaborators', 'name email -_id')
+      .select('-_id -createdAt -updatedAt -__v');
+    project = project.toJSON();
+    project.is_owner = project.owner._id === req.user._id;
+    delete project.owner._id;
+    project.allowRecaptcha = project.hasRecaptcha;
+    project.id = project.projectId;
+    delete project.projectId;
+    delete project.hasRecaptcha;
+    project.form_count = project.forms.length;
+    project.forms.forEach((form) => {
+      form.submission_count = form.submissions.length;
+      form.last_updated = form.updatedAt;
+      form.date_created = form.createdAt;
+      delete form.updatedAt;
+      delete form.createdAt;
+    });
+
     return response_200(res, 'Project Dashboard', project);
   } catch (error) {
     return response_500(res, 'Server error', error);
