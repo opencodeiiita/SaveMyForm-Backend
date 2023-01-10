@@ -153,6 +153,11 @@ export async function dashboard(req, res) {
       submissions: {
         total: { $count: '$submissions' },
         data: '$submissions',
+        page: page,
+        per_page: perpage,
+        has_next_page:{$ne: [page,0]},
+        total_pages: {$divide: ['$total',perpage]},
+        has_prev_page:{$ne: ['$total_pages',page+1]}
       },
     });
 }
