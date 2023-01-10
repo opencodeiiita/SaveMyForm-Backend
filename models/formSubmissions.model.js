@@ -13,7 +13,7 @@ function generate(length){
 
 const formSubmissionSchema = new Schema({
 
-    id : {
+    formSubmissionId : {
         type : String,
         require : true,
         default : generate(16)
