@@ -54,7 +54,7 @@ export async function updateForm(req, res) {
   });
 
   form = await form.project({
-    id: 1,
+    formId: 1,
     name: 1,
     hasRecaptchaVerification: 1,
     is_owner: { $eq: [req.user._id, '$$$project.owner._id'] },
@@ -94,7 +94,7 @@ export async function createForm(req, res) {
     await newForm.save();
     return response_201(res, 'New form created', {
       name: newForm.name,
-      id: newForm.id,
+      id: newForm.formId,
     });
   } catch (error) {
     return response_500(res, 'Server Error', error);
@@ -128,7 +128,7 @@ export async function dashboard(req, res) {
       select: 'id data file createdAt',
     })
     .project({
-      id: '$id',
+      formId: '$id',
       name: '$name',
       is_owner: { $eq: [req.user._id, '$$$project.owner._id'] },
       owner: {

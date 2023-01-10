@@ -16,7 +16,7 @@ const formSchema = new Schema(
       type: String,
       required: true,
     },
-    id: {
+    formId: {
       type: String,
       required: true,
       default: generate(16),

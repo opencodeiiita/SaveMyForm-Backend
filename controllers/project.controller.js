@@ -28,7 +28,7 @@ export async function createProject(req, res) {
     await newProject.save();
     return response_201(res, 'Project created', {
       name: newProject.name,
-      id: newProject.id,
+      id: newProject.projectId,
     });
   } catch (error) {
     return response_500(res, 'Server error', error);
@@ -45,7 +45,7 @@ export async function deleteProject(req, res) {
     return response_400(res, 'The user is not the owner of project.');
   if (password !== req.user.passwordHash)
     return response_400(res, 'Wrong Password');
-  Project.deleteOne({ id: project.id });
+  Project.deleteOne({ projectId: project.projectId });
   response_200(res, 'The project has been succesfully deleted.');
 }
 
