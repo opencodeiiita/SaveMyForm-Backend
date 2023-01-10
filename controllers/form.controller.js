@@ -94,7 +94,7 @@ export async function createForm(req, res) {
     await newForm.save();
     return response_201(res, 'New form created', {
       name: newForm.name,
-      id: newForm.id,
+      id: newForm.formId,
     });
   } catch (error) {
     return response_500(res, 'Server Error', error);
