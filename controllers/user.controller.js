@@ -112,33 +112,27 @@ export async function getUser(req, res) {
 export async function dashboard(req, res) {
   try {
     let user = req.user;
-    user = user
-      .populate({
-        path: 'projects',
-        options: { sort: { createdAt: -1 } },
-        select: 'id name forms allowed_origins createdAt',
-      })
-      .aggregate()
-      .project({
-        _id: 0,
-        name: 1,
-        email: 1,
-        verified: 1,
-        project_count: { $count: '$projects' },
-        projects: {
-          $map: {
-            input: '$projects',
-            as: 'projects',
-            in: {
-              id: '$$projects._id',
-              name: '$$projects.name',
-              form_count: { $count: '$$projects.forms' },
-              allowed_origins: '$$projects.allowed_origins',
-              createdAt: '$$projects.createdAt',
-            },
-          },
-        },
-      });
+    user = await user.populate({
+      path: 'projects',
+      options: { sort: { createdAt: -1 } },
+      select: 'id name forms allowed_origins createdAt',
+    });
+    user = await user.toJSON();
+    user.project_count = user.projects.length;
+    user.projects.map((project) => {
+      project.date_created = project.createdAt;
+      project.form_count = project.forms.length;
+      project.allowed_origins = project.allowed_origins;
+      delete project._id;
+      delete project.forms;
+      delete project.createdAt;
+    });
+    delete user._id;
+    delete user.passwordHash;
+    delete user.createdAt;
+    delete user.updatedAt;
+    delete user.__v;
+    console.log(user);
 
     return response_200(res, 'Sent required user data to dashboard', user);
   } catch (err) {

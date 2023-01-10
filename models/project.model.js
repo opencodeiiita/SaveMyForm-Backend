@@ -16,7 +16,7 @@ const projectSchema = new Schema(
             type: String,
             required: true
         },
-        id: {
+        projectId: {
             type: String,
             required: true,
             default: generate(16) 
