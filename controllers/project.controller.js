@@ -2,6 +2,8 @@ import Project from '../models/project.model.js';
 import User from '../models/user.model.js';
 import Form from '../models/form.model.js';
 import verifycaptcha from '../utils/recaptcha.js';
+import { sendCollabInvitationLink } from '../utils/mailer.js';
+import { getJwt } from '../utils/password.js';
 import {
   response_200,
   response_201,
@@ -18,7 +20,6 @@ export async function createProject(req, res) {
     name: req.body.name,
     owner: req.user._id,
   });
-  if (req.body.collaborators) newProject.collaborators = req.body.collaborators;
   if (req.body.allowedOrigins)
     newProject.allowedOrigins = req.body.allowedOrigins;
   if (req.body.reCaptchaKey) newProject.reCaptchaKey = req.body.reCaptchaKey;
@@ -27,6 +28,9 @@ export async function createProject(req, res) {
   if (req.body.hasRecaptcha) newProject.allowRecaptcha = req.body.hasRecaptcha;
   try {
     await newProject.save();
+    if (req.body.collaborators){
+      inviteCollaborators(req.body.collaborators,newProject.projectId,newProject.name,req.user._id)
+    }
     return response_201(res, 'Project created', {
       name: newProject.name,
       id: newProject.projectId,
@@ -87,7 +91,7 @@ export async function updateProject(req, res) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
     if (req.body.collaborators) {
-      updatedProject.collaborators = req.body.collaborators;
+      inviteCollaborators(req.body.collaborators,projectId,req.body.name,ownerId)
     }
 
     // updating the project details in DB
@@ -140,4 +144,14 @@ export async function projectDashboard(req, res) {
   } catch (error) {
     return response_500(res, 'Server error', error);
   }
+}
+
+function inviteCollaborators(email,projectId,projectName,ownerId){
+  const obj = {
+    projectId,
+    collaborators: email.join(';')
+  }
+  const secret = getJwt(obj)
+  const owner = User.findById(ownerId)
+  sendCollabInvitationLink(email,secret,projectName,owner.name,owner.email)
 }
