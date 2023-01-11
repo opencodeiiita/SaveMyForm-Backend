@@ -29,7 +29,7 @@ export async function createProject(req, res) {
   try {
     await newProject.save();
     if (req.body.collaborators){
-      inviteCollaborators(req.body.collaborators,newProject.projectId,newProject.name,req.user._id)
+      inviteCollaborators(req.body.collaborators,newProject.projectId,newProject.name,req.user.name,req.user.email)
     }
     return response_201(res, 'Project created', {
       name: newProject.name,
@@ -91,7 +91,7 @@ export async function updateProject(req, res) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
     if (req.body.collaborators) {
-      inviteCollaborators(req.body.collaborators,projectId,req.body.name,ownerId)
+      inviteCollaborators(req.body.collaborators,projectId,req.body.name,req.user.name,req.user.email)
     }
 
     // updating the project details in DB
@@ -146,12 +146,11 @@ export async function projectDashboard(req, res) {
   }
 }
 
-function inviteCollaborators(email,projectId,projectName,ownerId){
+function inviteCollaborators(email,projectId,projectName,userName,userEmail){
   const obj = {
     projectId,
     collaborators: email.join(';')
   }
   const secret = getJwt(obj)
-  const owner = User.findById(ownerId)
-  sendCollabInvitationLink(email,secret,projectName,owner.name,owner.email)
+  sendCollabInvitationLink(email,secret,projectName,userName,userEmail)
 }
