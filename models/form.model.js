@@ -27,8 +27,8 @@ const formSchema = new Schema(
       required: true,
     },
     schema: {
-      type: Schema.Types.Mixed,
-      required: true,
+      type: Object,
+      required: false,
     },
     hasFileField: {
       type: Boolean,
