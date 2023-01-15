@@ -9,7 +9,6 @@ import verifycaptcha from '../utils/recaptcha.js';
 import { hash_password } from '../utils/password.js';
 import Form from '../models/form.model.js';
 import Project from '../models/project.model.js';
-import { Schema } from 'mongoose';
 
 export async function updateForm(req, res) {
   const id = req.params.id;
@@ -73,7 +72,8 @@ export async function createForm(req, res) {
     !req.body.name ||
     !req.body.schema ||
     req.body.hasFileField === undefined ||
-    req.body.hasRecaptcha === undefined
+    req.body.hasRecaptcha === undefined ||
+    req.body.submissions === undefined
   )
     return response_400(res, 'All request parameters not present');
   if (req.body.name === '')
@@ -84,28 +84,32 @@ export async function createForm(req, res) {
   if (req.user._id !== project.owner)
     return response_400(res, 'Only the owner can create new form');
   try {
-    const newForm = Form({
+    let newForm = await Form.create({
       name: req.body.name,
-      project: Schema.Types.ObjectId(projectId),
-      schema: Schema.Types.Mixed(req.body.schema),
+      project: project._id,
+      schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
+      submissions: req.body.submissions,
     });
-    await newForm.save();
+    console.log(newForm);
     return response_201(res, 'New form created', {
       name: newForm.name,
       id: newForm.formId,
     });
   } catch (error) {
+    console.log(error);
     return response_500(res, 'Server Error', error);
   }
 }
 
+//This is currently not working as intended since we don't have routes for formSubmission
+//and as a result we cannot sort or check it for now.
+//So I have written the function but can't verify if it works or not for now.
 export async function dashboard(req, res) {
   const id = req.params.id;
-  // const { sort } = req.body;w
   let form = await Form.findById(id);
-  form = form
+  form = Form.findOne({ formId: id })
     .populate({
       path: 'project',
       select: 'owner collaborators',
@@ -119,45 +123,54 @@ export async function dashboard(req, res) {
     req.user._id !== form.project.owner._id &&
     !(req.user._id in form.project.collaborators)
   )
-    //
     response_401(res, 'UnAuthorised');
 
-    const sort={}
-    if(req.query.sort){
-        const parts = req.query.sort.split(':')
-        sort[parts[0]] = (parts[1]==='desc'? -1 : 1)
-    }
-    let perpage = parseInt(req.query.perpage);
-    let page = parseInt(req.query.page)
+  const sort = {};
+  if (req.query.sort) {
+    const parts = req.query.sort.split(':');
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
+  }
+  let perpage = parseInt(req.query.perpage);
+  let page = parseInt(req.query.page);
 
-  form = await form
+  let submissions = Form.findOne({ formId: id });
+  let total_pages = submissions.submissions.length / perpage;
+  total_pages = Math.ceil(total_pages);
+
+  if (page < 0 || page > total_pages) {
+    response_400(res, 'invalid page number');
+  }
+  form = await Form.findOne({ formId: id })
+    .populate({
+      path: 'project',
+      select: 'owner collaborators',
+    })
+    .populate({
+      path: 'project.owner',
+      select: '_id name email',
+    })
     .populate({
       path: 'submissions',
       select: 'id data file createdAt',
       perDocumentLimit: perpage,
-      options:{
-        // limit: parseInt(req.query.perpage),
-        skip: page*perpage,
-        sort
+      options: {
+        limit: parseInt(perpage),
+        skip: page * perpage,
+        sort,
       },
     })
-    .project({
-      formId: '$id',
-      name: '$name',
-      is_owner: { $eq: [req.user._id, '$$$project.owner._id'] },
-      owner: {
-        name: '$$$project.owner.name',
-        email: '$$$project.owner.email',
-      },
-      hasRecaptcha: '$hasRecaptcha',
-      submissions: {
-        total: { $count: '$submissions' },
-        data: '$submissions',
-        page: page,
-        per_page: perpage,
-        has_next_page:{$ne: [page,0]},
-        total_pages: {$divide: ['$total',perpage]},
-        has_prev_page:{$ne: ['$total_pages',page+1]}
-      },
-    });
+    .select('formId name project hasRecaptcha submissions');
+  form = form.toJSON();
+  form.id = form.formId;
+  delete form.formId;
+  form.owner = form.project.owner;
+  form.submissions = {
+    total: form.submissions.length,
+    data: form.submissions,
+    page: page,
+    perpage: perpage,
+    has_next_page: page < total_pages,
+    total_pages: total_pages,
+    has_prev_pages: page > 0,
+  };
 }
