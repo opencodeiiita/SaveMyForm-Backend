@@ -28,8 +28,16 @@ export async function createProject(req, res) {
   if (req.body.hasRecaptcha) newProject.allowRecaptcha = req.body.hasRecaptcha;
   try {
     await newProject.save();
-    if (req.body.collaborators){
-      inviteCollaborators(req.body.collaborators,newProject.projectId,newProject.name,req.user.name,req.user.email)
+    req.user.projects.push(newProject._id);
+    await req.user.save();
+    if (req.body.collaborators) {
+      inviteCollaborators(
+        req.body.collaborators,
+        newProject.projectId,
+        newProject.name,
+        req.user.name,
+        req.user.email,
+      );
     }
     return response_201(res, 'Project created', {
       name: newProject.name,
@@ -45,12 +53,14 @@ export async function deleteProject(req, res) {
     return response_400(res, 'Captcha not verified');
   const id = req.params.id;
   const password = await hash_password(req.body.password);
-  const project = await Project.findById(id);
+  const project = await Project.findOne({ projectId: id });
   if (project.owner !== req.user.id)
     return response_400(res, 'The user is not the owner of project.');
   if (password !== req.user.passwordHash)
     return response_400(res, 'Wrong Password');
-  Project.deleteOne({ projectId: project.projectId });
+  req.user.projects = req.user.projects.filter((p) => p !== project._id);
+  await req.user.save();
+  await Project.deleteOne({ projectId: project.projectId });
   response_200(res, 'The project has been succesfully deleted.');
 }
 
@@ -61,7 +71,10 @@ export async function updateProject(req, res) {
     }
 
     const projectId = req.params.projectId;
-    const { ownerId } = await Project.findById(projectId, '-_id owner');
+    const { ownerId } = await Project.findOne(
+      { projectId: projectId },
+      '-_id owner',
+    );
 
     if (req.user.id !== ownerId) {
       // current user is not the owner of the project
@@ -91,12 +104,18 @@ export async function updateProject(req, res) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
     if (req.body.collaborators) {
-      inviteCollaborators(req.body.collaborators,projectId,req.body.name,req.user.name,req.user.email)
+      inviteCollaborators(
+        req.body.collaborators,
+        projectId,
+        req.body.name,
+        req.user.name,
+        req.user.email,
+      );
     }
 
     // updating the project details in DB
-    const finalProject = await Project.findByIdAndUpdate(
-      projectId,
+    const finalProject = await Project.findOneAndUpdate(
+      { projectId: projectId },
       updatedProject,
       { returnDocument: 'after', select: '-_id -forms' },
     )
@@ -119,7 +138,7 @@ export async function projectDashboard(req, res) {
     return response_400(res, 'You cannot access this project');
 
   try {
-    project = await Project.findOne({ id: req.params.id })
+    project = await Project.findOne({ projectId: req.params.id })
       .populate('forms', 'name submissions createdAt updatedAt -_id')
       .populate('owner', 'name email')
       .populate('collaborators', 'name email -_id')
