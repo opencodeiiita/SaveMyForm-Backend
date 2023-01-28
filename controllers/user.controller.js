@@ -118,7 +118,6 @@ export async function dashboard(req, res) {
       select: 'projectId name forms allowedOrigins createdAt',
     });
     user = await user.toJSON();
-    console.log(user);
     user.project_count = user.projects.length;
     user.projects.map((project) => {
       project.date_created = project.createdAt;
@@ -136,7 +135,6 @@ export async function dashboard(req, res) {
     delete user.createdAt;
     delete user.updatedAt;
     delete user.__v;
-    console.log(user);
 
     return response_200(res, 'Sent required user data to dashboard', user);
   } catch (err) {

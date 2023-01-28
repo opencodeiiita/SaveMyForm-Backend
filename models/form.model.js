@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 function generate(len) {
   const characters = 'abcdefghijklmnopqrstuvwxyz';
-  let result = ' ';
+  let result = '';
   const charactersLength = characters.length;
   for (let i = 0; i < len; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));

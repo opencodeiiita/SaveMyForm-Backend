@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 function generate(length){
     const characters = "qwertyuiopasdfghjklzxcvbnm1234567890";
-    let str = "";
+    let result = '';
     const reqlength = characters.length;
     for(let i=0;i<length;i++){
         result += characters.charAt(Math.floor(Math.random() * reqlength));

@@ -29,13 +29,14 @@ export function mailer(subject, email, body, html) {
 }
 
 export function sendVerificationLink(email, secret, ip) {
+  console.log(secret);
   let link = 'http://savemyform.tk/verify/' + secret;
   const handlebarOptions = {
     viewEngine: {
-      partialsDir: path.resolve('../templates/'),
+      partialsDir: path.resolve('templates/'),
       defaultLayout: false,
     },
-    viewPath: path.resolve('../templates/'),
+    viewPath: path.resolve('templates/'),
   };
   transporter.use('compile', hbs(handlebarOptions));
   var mailOptions = {
@@ -67,10 +68,10 @@ export function sendCollabInvitationLink(
   let link = 'http://savemyform.tk/collab/' + secret;
   const handlebarOptions = {
     viewEngine: {
-      partialsDir: path.resolve('../templates/'),
+      partialsDir: path.resolve('templates/'),
       defaultLayout: false,
     },
-    viewPath: path.resolve('../templates/'),
+    viewPath: path.resolve('templates/'),
   };
   transporter.use('compile', hbs(handlebarOptions));
   var mailOptions = {
@@ -82,7 +83,7 @@ export function sendCollabInvitationLink(
       url: link,
       projectName,
       userName,
-      userEmail
+      userEmail,
     },
   };
   transporter.sendMail(mailOptions, (err, info) => {
