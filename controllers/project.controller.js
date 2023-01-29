@@ -3,7 +3,7 @@ import User from '../models/user.model.js';
 import Form from '../models/form.model.js';
 import verifycaptcha from '../utils/recaptcha.js';
 import { sendCollabInvitationLink } from '../utils/mailer.js';
-import { getJwt } from '../utils/password.js';
+import { getJwt, hash_password } from '../utils/password.js';
 import {
   response_200,
   response_201,
@@ -56,6 +56,7 @@ export async function deleteProject(req, res) {
   if (!verifycaptcha(req.body.recaptcha_token))
     return response_400(res, 'Captcha not verified');
   const id = req.params.id;
+  console.log(req.body);
   const password = await hash_password(req.body.password);
   const project = await Project.findOne({ projectId: id });
   if (String(project.owner) !== String(req.user.id))
@@ -65,7 +66,6 @@ export async function deleteProject(req, res) {
   req.user.projects = req.user.projects.filter((p) => p !== project._id);
   await req.user.save();
   await Project.deleteOne({ projectId: project.projectId });
-  console.log(res);
   response_200(res, 'The project has been succesfully deleted.');
 }
 
@@ -165,7 +165,6 @@ export async function projectDashboard(req, res) {
       delete form.updatedAt;
       delete form.createdAt;
     });
-    console.log(project);
     return response_200(res, 'Project Dashboard', project);
   } catch (error) {
     return response_500(res, 'Server error', error);
