@@ -72,16 +72,18 @@ export async function createForm(req, res) {
     !req.body.name ||
     !req.body.schema ||
     req.body.hasFileField === undefined ||
-    req.body.hasRecaptcha === undefined ||
-    req.body.submissions === undefined
+    req.body.hasRecaptcha === undefined
+    // req.body.submissions === undefined
   )
     return response_400(res, 'All request parameters not present');
   if (req.body.name === '')
     return response_400(res, 'Name cannot be an empty string');
   const projectId = req.params.projectId;
-  const project = await Project.findById(projectId);
+  const project = await Project.findOne({ projectId });
   if (!project) return response_400(res, 'No project found with this id');
-  if (req.user._id !== project.owner)
+
+  //Mongoose object id cannot be equated directly so i converted them into string and checked that.
+  if (String(req.user._id) !== String(project.owner))
     return response_400(res, 'Only the owner can create new form');
   try {
     let newForm = await Form.create({
@@ -90,9 +92,18 @@ export async function createForm(req, res) {
       schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
-      submissions: req.body.submissions,
+      submissions: [null],
     });
-    console.log(newForm);
+
+    Project.findByIdAndUpdate(
+      project._id,
+      { forms: [...project.forms, newForm._id] },
+      function (error) {
+        if (error) {
+          return response_500(res, 'Database Error', error);
+        }
+      },
+    );
     return response_201(res, 'New form created', {
       name: newForm.name,
       id: newForm.formId,

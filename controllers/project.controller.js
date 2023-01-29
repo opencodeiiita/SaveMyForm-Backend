@@ -20,12 +20,16 @@ export async function createProject(req, res) {
     name: req.body.name,
     owner: req.user._id,
   });
-  if (req.body.allowedOrigins)
-    newProject.allowedOrigins = req.body.allowedOrigins;
-  if (req.body.reCaptchaKey) newProject.reCaptchaKey = req.body.reCaptchaKey;
-  if (req.body.reCaptchaSecret)
-    newProject.reCaptchaSecret = req.body.reCaptchaSecret;
-  if (req.body.hasRecaptcha) newProject.allowRecaptcha = req.body.hasRecaptcha;
+  // if (req.body.allowedOrigins)
+  newProject.allowedOrigins = req.body?.allowedOrigins;
+  // if (req.body.reCaptchaKey)
+  newProject.reCaptchaKey = req.body?.reCaptchaKey;
+  // if (req.body.reCaptchaSecret)
+  newProject.reCaptchaSecret = req.body?.reCaptchaSecret;
+  // if (req.body.hasRecaptcha)
+  newProject.allowRecaptcha = req.body?.hasRecaptcha;
+
+  console.log(newProject);
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
@@ -54,13 +58,14 @@ export async function deleteProject(req, res) {
   const id = req.params.id;
   const password = await hash_password(req.body.password);
   const project = await Project.findOne({ projectId: id });
-  if (project.owner !== req.user.id)
+  if (String(project.owner) !== String(req.user.id))
     return response_400(res, 'The user is not the owner of project.');
   if (password !== req.user.passwordHash)
     return response_400(res, 'Wrong Password');
   req.user.projects = req.user.projects.filter((p) => p !== project._id);
   await req.user.save();
   await Project.deleteOne({ projectId: project.projectId });
+  console.log(res);
   response_200(res, 'The project has been succesfully deleted.');
 }
 
@@ -134,17 +139,17 @@ export async function projectDashboard(req, res) {
   let project = await Project.findOne({ projectId: req.params.id });
   if (!project) return response_400(res, 'No project with this id');
   let allow = project.collaborators.includes(req.user._id);
-  if (!allow && project.owner !== req.user._id)
+  if (!allow && String(project.owner) !== String(req.user._id))
     return response_400(res, 'You cannot access this project');
 
   try {
     project = await Project.findOne({ projectId: req.params.id })
-      .populate('forms', 'name submissions createdAt updatedAt -_id')
+      .populate('forms', 'formId name submissions createdAt updatedAt -_id')
       .populate('owner', 'name email')
       .populate('collaborators', 'name email -_id')
       .select('-_id -createdAt -updatedAt -__v');
     project = project.toJSON();
-    project.is_owner = project.owner._id === req.user._id;
+    project.is_owner = String(project.owner._id) === String(req.user._id);
     delete project.owner._id;
     project.allowRecaptcha = project.hasRecaptcha;
     project.id = project.projectId;
@@ -155,21 +160,29 @@ export async function projectDashboard(req, res) {
       form.submission_count = form.submissions.length;
       form.last_updated = form.updatedAt;
       form.date_created = form.createdAt;
+      form.id = form.formId;
+      delete form.formId;
       delete form.updatedAt;
       delete form.createdAt;
     });
-
+    console.log(project);
     return response_200(res, 'Project Dashboard', project);
   } catch (error) {
     return response_500(res, 'Server error', error);
   }
 }
 
-function inviteCollaborators(email,projectId,projectName,userName,userEmail){
+function inviteCollaborators(
+  email,
+  projectId,
+  projectName,
+  userName,
+  userEmail,
+) {
   const obj = {
     projectId,
-    collaborators: email.join(';')
-  }
-  const secret = getJwt(obj)
-  sendCollabInvitationLink(email,secret,projectName,userName,userEmail)
+    collaborators: email.join(';'),
+  };
+  const secret = getJwt(obj);
+  sendCollabInvitationLink(email, secret, projectName, userName, userEmail);
 }

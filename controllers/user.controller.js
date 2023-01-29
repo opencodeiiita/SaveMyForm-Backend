@@ -115,7 +115,7 @@ export async function dashboard(req, res) {
     user = await user.populate({
       path: 'projects',
       options: { sort: { createdAt: -1 } },
-      select: 'id name forms allowedOrigins createdAt',
+      select: 'projectId name forms allowedOrigins createdAt',
     });
     user = await user.toJSON();
     user.project_count = user.projects.length;
@@ -123,6 +123,8 @@ export async function dashboard(req, res) {
       project.date_created = project.createdAt;
       project.form_count = project.forms.length;
       project.allowed_origins = project.allowedOrigins;
+      project.id = project.projectId;
+      delete project.projectId;
       delete project.allowedOrigins;
       delete project._id;
       delete project.forms;
