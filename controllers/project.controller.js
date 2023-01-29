@@ -65,7 +65,6 @@ export async function deleteProject(req, res) {
   req.user.projects = req.user.projects.filter((p) => p !== project._id);
   await req.user.save();
   await Project.deleteOne({ projectId: project.projectId });
-  console.log(res);
   response_200(res, 'The project has been succesfully deleted.');
 }
 
