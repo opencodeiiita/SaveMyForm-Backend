@@ -155,9 +155,9 @@ export async function projectDashboard(req, res) {
     project.id = project.projectId;
     delete project.projectId;
     delete project.hasRecaptcha;
-    project.form_count = project.forms.length;
+    project.form_count = project?.forms?.length;
     project.forms.forEach((form) => {
-      form.submission_count = form.submissions.length;
+      form.submission_count = form?.submissions?.length;
       form.last_updated = form.updatedAt;
       form.date_created = form.createdAt;
       form.id = form.formId;
@@ -167,6 +167,7 @@ export async function projectDashboard(req, res) {
     });
     return response_200(res, 'Project Dashboard', project);
   } catch (error) {
+    console.log(error);
     return response_500(res, 'Server error', error);
   }
 }
