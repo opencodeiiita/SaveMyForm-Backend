@@ -34,11 +34,16 @@ const formSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    submissions: [
+    // submissions: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'formSubmission',
+    //   },
+    // ],
+    submission : [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'formSubmission',
-      },
+        type : String,
+      }
     ],
     hasRecaptchaVerification: {
       type: Boolean,

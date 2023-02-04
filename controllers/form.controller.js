@@ -92,7 +92,7 @@ export async function createForm(req, res) {
       schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
-      submissions: [null],
+      submissions: [],
     });
 
     Project.findByIdAndUpdate(
