@@ -3,12 +3,18 @@ import hbs from 'nodemailer-express-handlebars';
 import path from 'path';
 
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
   auth: {
     user: process.env.MAIL_ADDRESS,
     pass: process.env.MAIL_PASSWORD,
   },
 });
+
+const BASE_URL =
+  process.env.ENV === 'prod'
+    ? 'https://www.savemyform.tk'
+    : 'http://localhost:3000';
 
 export function mailer(subject, email, body, html) {
   let mailOptions = {
@@ -30,7 +36,7 @@ export function mailer(subject, email, body, html) {
 
 export function sendVerificationLink(email, secret, ip) {
   console.log(secret);
-  let link = 'http://savemyform.tk/verify/' + secret;
+  let link = BASE_URL + '/verify/' + secret;
   const handlebarOptions = {
     viewEngine: {
       partialsDir: path.resolve('templates/'),
@@ -65,7 +71,7 @@ export function sendCollabInvitationLink(
   userName,
   userEmail,
 ) {
-  let link = 'http://savemyform.tk/collab/' + secret;
+  let link = BASE_URL + '/collab/' + secret;
   const handlebarOptions = {
     viewEngine: {
       partialsDir: path.resolve('templates/'),

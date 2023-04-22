@@ -43,11 +43,7 @@
         border-radius: 1rem;
       }
       button:hover {
-        border: none;
-        font-size: 105%;
-        height: 3.2rem;
-        width: 12.5rem;
-        transition: 0.2s;
+        cursor: pointer;
       }
       a {
         text-decoration: none;
@@ -153,7 +149,7 @@
           We need to verify your email address. Kindly click on the following
           link !
         </p>
-        <a href="{url}" class="c ard-link">
+        <a href="{{url}}" class="c ard-link">
           <button style="color: white">Verify Your Email</button>
         </a>
         <p class="card-text">
@@ -161,10 +157,10 @@
           browser.
         </p>
         <p class="card-text">
-          <a href="{url}" style="color: #006dfb">{url}</a>
+          <a href="{{url}}" style="color: #006dfb">{{url}}</a>
         </p>
         <p class="card-text">
-          The verification request was generated on the ip address: {ip}
+          The verification request was generated on the ip address: {{ip}}
         </p>
       </div>
     </div>

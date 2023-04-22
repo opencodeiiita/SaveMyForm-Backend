@@ -14,5 +14,4 @@ export default function connDB() {
       //   bucketName: 'uploads',
       // });
     });
-  }
-
+}
