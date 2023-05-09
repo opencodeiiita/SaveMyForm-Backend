@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import cors from 'cors'
+import {PrismaClient} from '@prisma/client';
 
 dotenv.config();
 
