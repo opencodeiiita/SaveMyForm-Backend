@@ -125,8 +125,12 @@ You need npm/yarn installed in your local machine in order to run this app.
 ## Enviornment Variables
 
 - MONGO_DB_CONN_STRING : required
-- POSTGRES_CONN_STRING = required
+- POSTGRES_CONN_STRING : required
 - SECRET : (random string) required
+- S3_ACCESS_KEY_ID : required if submitting
+- S3_ACCESS_KEY_SECRET : required if submitting
+- S3_BUCKET_REGION : required if submitting
+- S3_BUCKET_NAME : required if submitting
 - GOOGLE_OAUTH_CLIENT_ID : optional
 - GOOGLE_OAUTH_CLIENT_SECRET : optional
 - GOOGLE_RECAPTCHA_SITE_KEY : optional 
