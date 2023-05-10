@@ -125,7 +125,7 @@ You need npm/yarn installed in your local machine in order to run this app.
 ## Enviornment Variables
 
 - MONGO_DB_CONN_STRING : required
-- POSTGRES_CONN_STRING : required
+- MYSQL_CONN_STRING : required
 - SECRET : (random string) required
 - S3_ACCESS_KEY_ID : required if submitting
 - S3_ACCESS_KEY_SECRET : required if submitting
