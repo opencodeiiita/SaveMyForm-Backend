@@ -95,7 +95,7 @@ export async function authGoogle(req, res) {
       audience: process.env.GOOGLE_OAUTH_CLIENT_ID,
     });
     const { name, email } = ticket.getPayload();
-    const checkUser = await User.exists({ email });
+    const checkUser = await User.findOne({ email });
     if (checkUser) {
       const jwtToken = getJwt({ id: checkUser._id, email: email });
       return response_200(res, 'Log In Succesful', {
