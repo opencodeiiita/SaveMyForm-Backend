@@ -185,3 +185,14 @@ export async function dashboard(req, res) {
     has_prev_pages: page > 0,
   };
 }
+
+export async function deleteForm(req,res){
+  try {
+    const id = req.body.id;
+    const form=await Form.findOneAndDelete({formId:id});
+    if(!form) return res.status(400).json({msg:"Form not found"});
+    res.status(200).json({data:form,msg:"Form deleted successfully"}); 
+  } catch (error) {
+    res.status(500).json({msg:error});  
+  } 
+}
