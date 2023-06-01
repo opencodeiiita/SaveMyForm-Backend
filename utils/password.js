@@ -4,6 +4,7 @@ dotev.config()
 
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import CryptoJS from "crypto-js";
 
 
 export function getJwt(object,expiresIn='30d'){
@@ -25,4 +26,14 @@ export async function hash_password(password){
       .pbkdf2Sync(password, salt, 10000, 64, "sha512")
       .toString("hex");
     return genHash;
+}
+
+export async function encryptString(str){
+    const encrypted = await CryptoJS.AES.encrypt(str, process.env.SECRET);
+    return encrypted;
+}
+
+export async function dcryptString(encryptedStr){
+  const decrypted =await CryptoJS.AES.decrypt(encryptedStr, process.env.SECRET);
+  return decrypted;
 }
