@@ -11,6 +11,7 @@ import {
   response_401,
   response_500,
 } from '../utils/responseCodes.js';
+import { generateRandomString } from '../utils/generateRandomString.js';
 
 export async function createProject(req, res) {
   if (!verifycaptcha(req.body.recaptcha_token))
@@ -23,6 +24,7 @@ export async function createProject(req, res) {
   const newProject = Project({
     name: req.body.name,
     owner: req.user._id,
+    projectId: generateRandomString(16),
   });
   // if (req.body.allowedOrigins)
   newProject.allowedOrigins = req.body?.allowedOrigins;

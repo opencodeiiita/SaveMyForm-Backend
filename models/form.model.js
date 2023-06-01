@@ -1,15 +1,5 @@
 import { Schema, model } from 'mongoose';
 
-function generate(len) {
-  const characters = 'abcdefghijklmnopqrstuvwxyz';
-  let result = '';
-  const charactersLength = characters.length;
-  for (let i = 0; i < len; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 const formSchema = new Schema(
   {
     name: {
@@ -19,7 +9,7 @@ const formSchema = new Schema(
     formId: {
       type: String,
       required: true,
-      default: generate(16),
+      // default: generate(16),
     },
     project: {
       type: Schema.Types.ObjectId,

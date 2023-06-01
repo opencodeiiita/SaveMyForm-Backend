@@ -9,6 +9,7 @@ import verifycaptcha from '../utils/recaptcha.js';
 import { hash_password } from '../utils/password.js';
 import Form from '../models/form.model.js';
 import Project from '../models/project.model.js';
+import { generateRandomString } from '../utils/generateRandomString.js';
 
 export async function updateForm(req, res) {
   const id = req.params.id;
@@ -98,6 +99,7 @@ export async function createForm(req, res) {
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
       submissions: [],
+      formId: generateRandomString(16),
     });
 
     Project.findByIdAndUpdate(
