@@ -34,15 +34,9 @@ export async function createProject(req, res) {
     await newProject.save();
     req.user.projects.push(newProject._id);
     await req.user.save();
-    if (req.body.collaborators) {
-      inviteCollaborators(
-        req.body.collaborators,
-        newProject.projectId,
-        newProject.name,
-        req.user.name,
-        req.user.email,
-      );
-    }
+
+    //disabled adding collaborators while creating new project
+
     return response_201(res, 'Project created', {
       name: newProject.name,
       id: newProject.projectId,
@@ -108,15 +102,8 @@ export async function updateProject(req, res) {
     if (req.body.allowedOrigins) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
-    if (req.body.collaborators) {
-      inviteCollaborators(
-        req.body.collaborators,
-        projectId,
-        req.body.name,
-        req.user.name,
-        req.user.email,
-      );
-    }
+   
+    //disabled adding collaborators while updating new project
 
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
