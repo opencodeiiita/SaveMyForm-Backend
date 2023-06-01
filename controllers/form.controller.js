@@ -86,6 +86,11 @@ export async function createForm(req, res) {
   //Mongoose object id cannot be equated directly so i converted them into string and checked that.
   if (String(req.user._id) !== String(project.owner))
     return response_400(res, 'Only the owner can create new form');
+  //If the project has 5 forms already then we cannot create a new form.
+  if (project.forms.length == 5) {
+    return response_400(res, 'Number of forms in this project has already reached max limit of 5.');
+  }
+
   try {
     let newForm = await Form.create({
       name: req.body.name,

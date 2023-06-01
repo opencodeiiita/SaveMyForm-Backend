@@ -17,6 +17,10 @@ export async function createProject(req, res) {
   if (!verifycaptcha(req.body.recaptcha_token))
     return response_400(res, 'Captcha not verified');
   if (!req.body.name) return response_400(res, 'Project name is required');
+  const user = await User.findById(req.user._id);
+  if (user.projects.length >= 5) {
+    return response_400(res, 'Maximum number of 5 projects reached for this user.');
+  }
   const newProject = Project({
     name: req.body.name,
     owner: req.user._id,
@@ -30,6 +34,17 @@ export async function createProject(req, res) {
   newProject.reCaptchaSecret = req.body?.reCaptchaSecret;
   // if (req.body.hasRecaptcha)
   newProject.allowRecaptcha = req.body?.hasRecaptcha;
+
+  console.log(newProject);
+  //number of origins of project greater than 3 not allowed
+  if (newProject.allowedOrigins.length > 3) {
+    return response_400(res, 'Number of allowed origins cannot be greater than 3');
+  }
+  //number of collaborators of the project greater than 5 not allowed
+  if (req.body.collaborators.length > 5) {
+    return response_400(res, 'Number of collaborators cannot be greater than 5');
+  }
+
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
@@ -106,9 +121,15 @@ export async function updateProject(req, res) {
       updatedProject.reCaptchaSecret = req.body.reCaptchaSecret;
     }
     if (req.body.allowedOrigins) {
+      if (req.body.allowedOrigins.length > 3) {
+        return response_400(res, 'Number of allowed origins cannot be greater than 3');
+      }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
     if (req.body.collaborators) {
+      if (req.body.collaborators.length > 5) {
+        return response_400(res, 'Number of collaborators cannot be greater than 5');
+      }
       inviteCollaborators(
         req.body.collaborators,
         projectId,
