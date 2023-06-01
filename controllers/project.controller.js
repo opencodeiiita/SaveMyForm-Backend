@@ -159,6 +159,39 @@ export async function projectDashboard(req, res) {
   }
 }
 
+export async function AddCollaborator(req, res) {
+     try {
+      let projectId=req.query.projectId;
+      let collaboratorId=req.query.collaboratorId;
+
+      let project=await Project.findById(projectId);
+
+      project.collaborators.push(collaboratorId);
+      project.save();
+
+      return response_200(res, 'collaborator Added', project);
+
+     } catch (error) {
+      console.log(error);
+      return response_500(res, 'Server error', error);
+     }
+}
+
+export async function removeCollaborator(req, res) {
+     try {
+      let projectId=req.query.projectId;
+      let collaboratorId=req.query.collaboratorId;
+
+      let project=await Project.findByIdAndUpdate(projectId,{$pull:{collaborators:collaboratorId}});
+
+      return response_200(res, 'collaborator removed', project);
+
+     } catch (error) {
+      console.log(error);
+      return response_500(res, 'Server error', error);
+     }
+}
+
 function inviteCollaborators(
   email,
   projectId,
