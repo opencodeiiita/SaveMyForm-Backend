@@ -208,12 +208,12 @@ export async function deleteForm(req, res) {
     if (!form) {
       return res.status(400).json({ msg: "Form not found" });
     }
-    const isOwner = req.user._id.toString() === form.project.owner._id.toString();
-    const isCollaborator = form.project.collaborators.includes(req.user._id.toString());
-    if (!isOwner && !isCollaborator) {
+    const isOwner = req.user._id === form.project.owner._id;
+    if (!isOwner) {
       return res.status(401).json({ msg: "Unauthorized" });
     }
-    const password = req.body.password; // Assuming the password is provided in the request body
+    const password = req.body.password;
+    password = await hash_password(password); // Assuming the password is provided in the request body
     if (password !== form.project.owner.passwordHash) {
       return res.status(400).json({ msg: "User is not the owner" });
     }
