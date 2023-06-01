@@ -11,6 +11,7 @@ import {
   response_401,
   response_500,
 } from '../utils/responseCodes.js';
+import { generateRandomString } from '../utils/generateRandomString.js';
 
 export async function createProject(req, res) {
   if (!verifycaptcha(req.body.recaptcha_token))
@@ -19,6 +20,7 @@ export async function createProject(req, res) {
   const newProject = Project({
     name: req.body.name,
     owner: req.user._id,
+    projectId: generateRandomString(16),
   });
   // if (req.body.allowedOrigins)
   newProject.allowedOrigins = req.body?.allowedOrigins;
@@ -28,8 +30,6 @@ export async function createProject(req, res) {
   newProject.reCaptchaSecret = req.body?.reCaptchaSecret;
   // if (req.body.hasRecaptcha)
   newProject.allowRecaptcha = req.body?.hasRecaptcha;
-
-  console.log(newProject);
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
