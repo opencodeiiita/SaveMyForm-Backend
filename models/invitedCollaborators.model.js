@@ -1,13 +1,22 @@
 import { model, Schema } from 'mongoose';
 
 const invitedCollaboratorsSchema = new Schema({
-    invitedCollaborator:{
-        type: Schema.Types.ObjectId,
-        ref: 'user' 
+    email:{
+        type: String,
+        required:true 
+    },
+    username:{
+        type:String
+    },
+    projectId:{
+        type: Schema.Types.ObjectId ,
+        ref: 'project',
+        required:true,
     },
     status:{
         type:String,
-        default:"invited"
+        required:true,
+        enum:['Invited','Rejected','Accepted']
     }
 }, { timestamps: true });
 
