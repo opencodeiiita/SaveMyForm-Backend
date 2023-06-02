@@ -159,38 +159,38 @@ export async function projectDashboard(req, res) {
   }
 }
 
-export async function AddCollaborator(req, res) {
+export async function UpdateCollaborator(req, res) {
      try {
-      let projectId=req.query.projectId;
-      let collaboratorId=req.query.collaboratorId;
-
-      let project=await Project.findById(projectId);
-
-      project.collaborators.push(collaboratorId);
-      project.save();
-
-      return response_200(res, 'collaborator Added', project);
-
+      let project=await Project.findById(req.params.projectId).populate('owner', 'name email')
+      let is_owner = String(project.owner._id) === String(req.user._id);
+      if(!is_owner){
+        response_401('The user is not the owner of project.');
+      }else{
+        let collaborators=req.body.collaborators;
+        collaborators.forEach((collaborater)=>{
+          //invite collaborator
+        })
+      }
      } catch (error) {
       console.log(error);
       return response_500(res, 'Server error', error);
      }
 }
 
-export async function removeCollaborator(req, res) {
-     try {
-      let projectId=req.query.projectId;
-      let collaboratorId=req.query.collaboratorId;
+// export async function removeCollaborator(req, res) {
+//      try {
+//       let projectId=req.query.projectId;
+//       let collaboratorId=req.query.collaboratorId;
 
-      let project=await Project.findByIdAndUpdate(projectId,{$pull:{collaborators:collaboratorId}});
+//       let project=await Project.findByIdAndUpdate(projectId,{$pull:{collaborators:collaboratorId}});
 
-      return response_200(res, 'collaborator removed', project);
+//       return response_200(res, 'collaborator removed', project);
 
-     } catch (error) {
-      console.log(error);
-      return response_500(res, 'Server error', error);
-     }
-}
+//      } catch (error) {
+//       console.log(error);
+//       return response_500(res, 'Server error', error);
+//      }
+// }
 
 function inviteCollaborators(
   email,
