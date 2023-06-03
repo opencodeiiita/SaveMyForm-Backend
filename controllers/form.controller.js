@@ -94,6 +94,17 @@ export async function createForm(req, res) {
     );
   }
 
+  if(hasRecaptcha){
+    if(!req.body.reCaptchaKey || !req.body.reCaptchaSecret){
+      return response_400(res, 'reCaptchaKey or reCaptchaSecret not present');
+    }
+    else{
+      //encrypt the reCaptchaKey and reCaptchaSecret
+      req.body.reCaptchaKey = await encryptString(req.body.reCaptchaKey);
+      req.body.reCaptchaSecret = await encryptString(req.body.reCaptchaSecret);
+    }
+  }
+
   try {
     let formId = generateRandomString(16);
     let submisssionLinkGeneratedAt = Date.now();
@@ -111,6 +122,8 @@ export async function createForm(req, res) {
       schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
+      reCaptchaKey: req.body.reCaptchaKey,
+      reCaptchaSecret: req.body.reCaptchaSecret,
       submissions: [],
       formId: generateRandomString(16),
       submisssionLinkGeneratedAt,
