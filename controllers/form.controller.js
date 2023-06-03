@@ -206,6 +206,38 @@ export async function dashboard(req, res) {
     has_prev_pages: page > 0,
   };
 }
+
+export async function deleteForm(req, res) {
+  try {
+    const id = req.body.id;
+    const form = await Form.findById(id)
+      .populate({
+        path: 'project',
+        select: 'owner',
+      })
+      .populate({
+        path: 'project.owner',
+        select: '_id name email passwordHash',
+      });
+    if (!form) {
+      return res.status(400).json({ msg: "Form not found" });
+    }
+    const isOwner = req.user._id === form.project.owner._id;
+    if (!isOwner) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+    const password = req.body.password;
+    password = await hash_password(password); // Assuming the password is provided in the request body
+    if (password !== form.project.owner.passwordHash) {
+      return res.status(400).json({ msg: "User is not the owner" });
+    }
+    await form.deleteOne();
+    res.status(200).json({ data: form, msg: "Form deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ msg: "An error occurred while deleting the form" });
+  }
+}
+
 export async function generateSubmissionLink(req, res) {
   try {
     const { formId } = req.params;
@@ -224,3 +256,4 @@ export async function generateSubmissionLink(req, res) {
     return response_500(res, 'Server Error', error);
   }
 }
+
