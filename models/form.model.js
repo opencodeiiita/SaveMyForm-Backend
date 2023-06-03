@@ -30,14 +30,17 @@ const formSchema = new Schema(
     //     ref: 'formSubmission',
     //   },
     // ],
-    submission : [
+    submission: [
       {
-        type : String,
-      }
+        type: String,
+      },
     ],
     hasRecaptchaVerification: {
       type: Boolean,
       default: false,
+    },
+    submisssionLinkGeneratedAt: {
+      type: Date,
     },
   },
   { timestamps: true },
