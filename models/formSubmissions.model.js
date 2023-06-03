@@ -1,16 +1,4 @@
 // import { Schema, model } from 'mongoose';
-
-function generate(length) {
-  const characters = 'qwertyuiopasdfghjklzxcvbnm1234567890';
-  let result = '';
-  const reqlength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * reqlength));
-  }
-
-  return result;
-}
-
 // const formSubmissionSchema = new Schema({
 
 //     formSubmissionId : {
@@ -40,7 +28,6 @@ import sequelize from '../config/sql.config.js';
 const FormSubmissions = sequelize.define('FormSubmissions', {
   formSubmissionId: {
     type: DataTypes.CHAR(16),
-    defaultValue: generate(16),
     primaryKey: true,
   },
   form: {

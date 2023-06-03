@@ -12,14 +12,20 @@ import {
   response_401,
   response_500,
 } from '../utils/responseCodes.js';
+import { generateRandomString } from '../utils/generateRandomString.js';
 
 export async function createProject(req, res) {
   if (!verifycaptcha(req.body.recaptcha_token))
     return response_400(res, 'Captcha not verified');
   if (!req.body.name) return response_400(res, 'Project name is required');
+  const user = await User.findById(req.user._id);
+  if (user.projects.length >= 5) {
+    return response_400(res, 'Maximum number of 5 projects reached for this user.');
+  }
   const newProject = Project({
     name: req.body.name,
     owner: req.user._id,
+    projectId: generateRandomString(16),
   });
   // if (req.body.allowedOrigins)
   newProject.allowedOrigins = req.body?.allowedOrigins;
@@ -31,6 +37,15 @@ export async function createProject(req, res) {
   newProject.allowRecaptcha = req.body?.hasRecaptcha;
 
   console.log(newProject);
+  //number of origins of project greater than 3 not allowed
+  if (newProject.allowedOrigins.length > 3) {
+    return response_400(res, 'Number of allowed origins cannot be greater than 3');
+  }
+  //number of collaborators of the project greater than 5 not allowed
+  if (req.body.collaborators.length > 5) {
+    return response_400(res, 'Number of collaborators cannot be greater than 5');
+  }
+
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
@@ -101,10 +116,28 @@ export async function updateProject(req, res) {
       updatedProject.reCaptchaSecret = req.body.reCaptchaSecret;
     }
     if (req.body.allowedOrigins) {
+      if (req.body.allowedOrigins.length > 3) {
+        return response_400(res, 'Number of allowed origins cannot be greater than 3');
+      }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
+<<<<<<< HEAD
    
     //disabled adding collaborators while updating new project
+=======
+    if (req.body.collaborators) {
+      if (req.body.collaborators.length > 5) {
+        return response_400(res, 'Number of collaborators cannot be greater than 5');
+      }
+      inviteCollaborators(
+        req.body.collaborators,
+        projectId,
+        req.body.name,
+        req.user.name,
+        req.user.email,
+      );
+    }
+>>>>>>> 9043d5f0339f03657cb90eaa9b4a08ed1473f0ac
 
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
@@ -167,6 +200,7 @@ export async function updateCollaborator(req, res) {
       if(!is_owner){
         response_401('The user is not the owner of project.');
       }else{
+        //storing email we got in an array
         const emails=req.body.collaborators;
 
         // finding all collaborators with projectId
@@ -177,12 +211,13 @@ export async function updateCollaborator(req, res) {
 
         //iterating on every email we got
         emails.forEach(async (email)=>{
-          //check this email is present in array
+          //check this email is present in array of collaborators list of this project
           const isPresent= collaboratorsEmails.includes(email);
           if(!isPresent){
 
             //Invite new Collaborator with this email
 
+            // creating collaborator in db
             await Collaborators.create({
               email:email,
               projectId:req.params.projectId,
@@ -191,7 +226,7 @@ export async function updateCollaborator(req, res) {
           }
         })
 
-        //checking if any removed collaborators
+        //checking if any removed collaborators and deleting
         collaboratorsEmails.forEach(async (collaboratorEmail)=>{
           const isPresent= emails.includes(collaboratorEmail);
           if(!isPresent){
@@ -208,21 +243,6 @@ export async function updateCollaborator(req, res) {
       return response_500(res, 'Server error', error);
      }
 }
-
-// export async function removeCollaborator(req, res) {
-//      try {
-//       let projectId=req.query.projectId;
-//       let collaboratorId=req.query.collaboratorId;
-
-//       let project=await Project.findByIdAndUpdate(projectId,{$pull:{collaborators:collaboratorId}});
-
-//       return response_200(res, 'collaborator removed', project);
-
-//      } catch (error) {
-//       console.log(error);
-//       return response_500(res, 'Server error', error);
-//      }
-// }
 
 function inviteCollaborators(
   email,
