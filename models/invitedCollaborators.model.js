@@ -5,8 +5,11 @@ const invitedCollaboratorsSchema = new Schema({
         type: String,
         required:true 
     },
-    username:{
-        type:String
+    userId:{
+        type: Schema.Types.ObjectId ,
+        ref: 'user',
+        null:true,
+        default:null
     },
     projectId:{
         type: Schema.Types.ObjectId ,
@@ -20,6 +23,6 @@ const invitedCollaboratorsSchema = new Schema({
     }
 }, { timestamps: true });
 
-const InvitedCollaborator = model('invitedCollaborator', invitedCollaboratorsSchema);
+const InvitedCollaborator = model('Collaborators', invitedCollaboratorsSchema);
 
 export default InvitedCollaborator;

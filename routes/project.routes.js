@@ -12,6 +12,6 @@ router.post("/new", verifiedMiddleware, createProject);
 router.get("/dashboard/:id", verifiedMiddleware, projectDashboard);
 router.patch("/update/:projectId", verifiedMiddleware, updateProject);
 router.delete("/delete/:id", verifiedMiddleware, deleteProject)
-router.post("/UpdateCollaborator", UpdateCollaborator)
+router.post("/UpdateCollaborator", verifiedMiddleware,UpdateCollaborator)
 
 export default router;
