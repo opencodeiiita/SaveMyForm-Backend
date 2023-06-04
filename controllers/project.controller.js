@@ -121,10 +121,9 @@ export async function updateProject(req, res) {
       }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
-<<<<<<< HEAD
    
     //disabled adding collaborators while updating new project
-=======
+    
     if (req.body.collaborators) {
       if (req.body.collaborators.length > 5) {
         return response_400(res, 'Number of collaborators cannot be greater than 5');
@@ -137,7 +136,7 @@ export async function updateProject(req, res) {
         req.user.email,
       );
     }
->>>>>>> 9043d5f0339f03657cb90eaa9b4a08ed1473f0ac
+
 
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
