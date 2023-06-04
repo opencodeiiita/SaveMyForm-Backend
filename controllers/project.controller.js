@@ -200,7 +200,7 @@ export async function updateCollaborator(req, res) {
       if(!is_owner){
         response_401('The user is not the owner of project.');
       }else{
-        //storing email we got in an array
+        //storing emails we got in an array
         const emails=req.body.collaborators;
 
         // finding all collaborators with projectId
