@@ -51,8 +51,6 @@ export async function createProject(req, res) {
     req.user.projects.push(newProject._id);
     await req.user.save();
 
-    //disabled adding collaborators while creating new project
-
     return response_201(res, 'Project created', {
       name: newProject.name,
       id: newProject.projectId,
@@ -121,9 +119,7 @@ export async function updateProject(req, res) {
       }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
-   
-    //disabled adding collaborators while updating new project
-    
+  
     if (req.body.collaborators) {
       if (req.body.collaborators.length > 5) {
         return response_400(res, 'Number of collaborators cannot be greater than 5');
