@@ -13,21 +13,27 @@ import { generateRandomString } from '../utils/generateRandomString.js';
 
 export async function updateForm(req, res) {
   const id = req.params.id;
-  const request = req.body;
+
+  const {
+    name,
+    hasRecaptcha,
+    hasFileField,
+    schema,
+    password,
+    recaptcha_token,
+  } = req.body;
+
   if (
-    !(
-      'name' in request ||
-      'hasRecaptcha' in request ||
-      'hasFileField' in request ||
-      'schema' in request ||
-      'password' in request ||
-      'recaptcha_token' in request
-    )
+    !name ||
+    !hasRecaptcha ||
+    !hasFileField ||
+    !schema ||
+    !password ||
+    !recaptcha_token
   ) {
     response_400(res, 'Fields missing for updation');
   }
-  let { name, hasRecaptcha, hasFileField, schema, password, recaptcha_token } =
-    request;
+  
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha not verified');
   password = await hash_password(password);
@@ -94,11 +100,10 @@ export async function createForm(req, res) {
     );
   }
 
-  if(hasRecaptcha){
-    if(!req.body.reCaptchaKey || !req.body.reCaptchaSecret){
+  if (hasRecaptcha) {
+    if (!req.body.reCaptchaKey || !req.body.reCaptchaSecret) {
       return response_400(res, 'reCaptchaKey or reCaptchaSecret not present');
-    }
-    else{
+    } else {
       //encrypt the reCaptchaKey and reCaptchaSecret
       req.body.reCaptchaKey = await encryptString(req.body.reCaptchaKey);
       req.body.reCaptchaSecret = await encryptString(req.body.reCaptchaSecret);
@@ -233,21 +238,21 @@ export async function deleteForm(req, res) {
         select: '_id name email passwordHash',
       });
     if (!form) {
-      return res.status(400).json({ msg: "Form not found" });
+      return res.status(400).json({ msg: 'Form not found' });
     }
     const isOwner = req.user._id === form.project.owner._id;
     if (!isOwner) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: 'Unauthorized' });
     }
     const password = req.body.password;
     password = await hash_password(password); // Assuming the password is provided in the request body
     if (password !== form.project.owner.passwordHash) {
-      return res.status(400).json({ msg: "User is not the owner" });
+      return res.status(400).json({ msg: 'User is not the owner' });
     }
     await form.deleteOne();
-    res.status(200).json({ data: form, msg: "Form deleted successfully" });
+    res.status(200).json({ data: form, msg: 'Form deleted successfully' });
   } catch (error) {
-    res.status(500).json({ msg: "An error occurred while deleting the form" });
+    res.status(500).json({ msg: 'An error occurred while deleting the form' });
   }
 }
 
@@ -269,4 +274,3 @@ export async function generateSubmissionLink(req, res) {
     return response_500(res, 'Server Error', error);
   }
 }
-

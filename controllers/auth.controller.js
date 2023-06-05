@@ -44,10 +44,8 @@ export async function logIn(req, res) {
       secret: jwtToken,
     });
   } catch (error) {
-    console.log(error);
+    return response_500(res, 'Internal server error', error);
   }
-
-  // return response_200(res, 'Hello there!');
 }
 export function greet(req, res) {
   response_200(res, 'Hello There');
@@ -57,13 +55,16 @@ export async function signUp(req, res) {
   const { name, email, recaptcha_token } = req.body;
   if (!(name && email && recaptcha_token && req.body.password))
     return response_400(res, 'Some parameters are missing!');
+
   if (req.body.password.length < 6)
     return response_400(res, 'Password must be longer than 6 letters');
+
   if (!validator.isEmail(email)) return response_400(res, 'Email is invalid');
   const checkUser = await User.findOne({ email });
   if (checkUser) return response_400(res, 'Email already in use');
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha was found incorrect');
+    
   const password = await hash_password(req.body.password);
   let newUser = User({
     email,
