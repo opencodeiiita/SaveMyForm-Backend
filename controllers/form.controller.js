@@ -33,7 +33,7 @@ export async function updateForm(req, res) {
   ) {
     response_400(res, 'Fields missing for updation');
   }
-  
+
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha not verified');
   password = await hash_password(password);
@@ -99,17 +99,6 @@ export async function createForm(req, res) {
       'Number of forms in this project has already reached max limit of 5.',
     );
   }
-
-  if (hasRecaptcha) {
-    if (!req.body.reCaptchaKey || !req.body.reCaptchaSecret) {
-      return response_400(res, 'reCaptchaKey or reCaptchaSecret not present');
-    } else {
-      //encrypt the reCaptchaKey and reCaptchaSecret
-      req.body.reCaptchaKey = await encryptString(req.body.reCaptchaKey);
-      req.body.reCaptchaSecret = await encryptString(req.body.reCaptchaSecret);
-    }
-  }
-
   try {
     let formId = generateRandomString(16);
     let submisssionLinkGeneratedAt = Date.now();
@@ -127,8 +116,6 @@ export async function createForm(req, res) {
       schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
-      reCaptchaKey: req.body.reCaptchaKey,
-      reCaptchaSecret: req.body.reCaptchaSecret,
       submissions: [],
       formId: generateRandomString(16),
       submisssionLinkGeneratedAt,

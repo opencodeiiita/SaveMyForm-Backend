@@ -39,14 +39,6 @@ const formSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    reCaptchaKey:{
-      type: String,
-      required: false,
-    },
-    reCaptchaSecret:{
-      type: String,
-      required: false,
-    },
     submisssionLinkGeneratedAt: {
       type: Date,
     },
