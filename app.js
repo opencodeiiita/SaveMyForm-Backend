@@ -2,13 +2,12 @@ import express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
-import cors from 'cors'
-import {PrismaClient} from '@prisma/client';
-
+import cors from 'cors';
+import prismaDB from './config/sql.config.js';
 dotenv.config();
 
 const app = express();
-app.use(cors())
+app.use(cors());
 
 // supporting content types json, urlencoded for now
 app.use(bodyParser.json());
@@ -16,13 +15,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 import db from './config/db.config.js';
 db();
-
+prismaDB();
 app.use(
   morgan(
-    process.env["ENV"]==='dev'?'[:date[clf]] ":method :url :status" :res[content-length] - :response-time ms':':remote-addr - [:date[clf]] ":method :url :status" :res[content-length] - :response-time ms'
+    process.env['ENV'] === 'dev'
+      ? '[:date[clf]] ":method :url :status" :res[content-length] - :response-time ms'
+      : ':remote-addr - [:date[clf]] ":method :url :status" :res[content-length] - :response-time ms',
   ),
 );
-
 
 import authRoutes from './routes/auth.routes.js';
 app.use('/', authRoutes);

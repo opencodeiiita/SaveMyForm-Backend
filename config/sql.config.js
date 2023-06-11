@@ -1,4 +1,11 @@
-import { Sequelize } from 'sequelize';
-const sequelize = new Sequelize(process.env.POSTGRES_CONN_STRING);
-
-export default sequelize;
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+export default async function prismaDB() {
+  try {
+    await prisma.$connect();
+    console.log('connected to sql db');
+  } catch (error) {
+    console.log(error);
+  }
+}
+export { prisma };
