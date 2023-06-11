@@ -8,7 +8,7 @@ import User from '../models/user.model.js';
 
 export function getVerificationLink(req, res) {
   if (req.user.verified)
-    return response_400(res, 'The user is already verified');
+    return response_200(res, 'The user is already verified');
   const payload = {
     name: req.user.name,
     email: req.user.email,
