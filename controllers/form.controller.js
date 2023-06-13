@@ -10,7 +10,7 @@ import { hash_password, encryptString } from '../utils/password.js';
 import Form from '../models/form.model.js';
 import Project from '../models/project.model.js';
 import { generateRandomString } from '../utils/generateRandomString.js';
-
+import { prisma } from '../config/sql.config.js';
 export async function updateForm(req, res) {
   const id = req.params.id;
 
@@ -139,79 +139,74 @@ export async function createForm(req, res) {
     return response_500(res, 'Server Error', error);
   }
 }
-
-//This is currently not working as intended since we don't have routes for formSubmission
-//and as a result we cannot sort or check it for now.
-//So I have written the function but can't verify if it works or not for now.
-export async function dashboard(req, res) {
-  const id = req.params.id;
-  let form = await Form.findById(id);
-  form = Form.findOne({ formId: id })
-    .populate({
-      path: 'project',
-      select: 'owner collaborators',
-    })
-    .populate({
-      path: 'project.owner',
-      select: '_id name email',
-    });
-
-  if (
-    req.user._id !== form.project.owner._id &&
-    !(req.user._id in form.project.collaborators)
-  )
-    response_401(res, 'UnAuthorised');
-
-  const sort = {};
-  if (req.query.sort) {
-    const parts = req.query.sort.split(':');
-    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
-  }
-  let perpage = parseInt(req.query.perpage);
-  let page = parseInt(req.query.page);
-
-  let submissions = Form.findOne({ formId: id });
-  let total_pages = submissions.submissions.length / perpage;
-  total_pages = Math.ceil(total_pages);
-
-  if (page < 0 || page > total_pages) {
-    response_400(res, 'invalid page number');
-  }
-  form = await Form.findOne({ formId: id })
-    .populate({
-      path: 'project',
-      select: 'owner collaborators',
-    })
-    .populate({
-      path: 'project.owner',
-      select: '_id name email',
-    })
-    .populate({
-      path: 'submissions',
-      select: 'id data file createdAt',
-      perDocumentLimit: perpage,
-      options: {
-        limit: parseInt(perpage),
-        skip: page * perpage,
-        sort,
+export async function getForm(req, res) {
+  try {
+    const { formId } = req.params;
+    const form = await Form.aggregate([
+      {
+        $match: {
+          formId: formId,
+        },
       },
-    })
-    .select('formId name project hasRecaptcha submissions');
-  form = form.toJSON();
-  form.id = form.formId;
-  delete form.formId;
-  form.owner = form.project.owner;
-  form.submissions = {
-    total: form.submissions.length,
-    data: form.submissions,
-    page: page,
-    perpage: perpage,
-    has_next_page: page < total_pages,
-    total_pages: total_pages,
-    has_prev_pages: page > 0,
-  };
+      {
+        $lookup: {
+          from: 'projects',
+          localField: 'project',
+          foreignField: '_id',
+          as: 'project',
+        },
+      },
+      {
+        $unwind: '$project',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'project.owner',
+          foreignField: '_id',
+          as: 'project.owner',
+        },
+      },
+      {
+        $unwind: '$project.owner',
+      },
+      {
+        $addFields: {
+          is_owner: { $eq: [req.user._id, '$project.owner._id'] },
+          owner: {
+            name: '$project.owner.name',
+            email: '$project.owner.email',
+          },
+        },
+      },
+      {
+        $project: {
+          project: 0,
+          formId: 1,
+          _id: 0,
+          name: 1,
+          is_owner: 1,
+          owner: 1,
+          hasRecaptchaVerification: 1,
+          hasFileField: 1,
+          schema: 0,
+          submission: 0,
+          submisssionLinkGeneratedAt: 1,
+        },
+      },
+    ]);
+    if (!form) return response_400(res, 'Form not found');
+    const formSubmissions = await prisma.formSubmission.findMany({
+      where: {
+        formId: formId,
+      },
+    });
+    form.submission = formSubmissions;
+    return response_200(res, 'OK', form);
+  } catch (error) {
+    return response_500(res, 'Server Error', error);
+  }
 }
-
 export async function deleteForm(req, res) {
   try {
     const id = req.body.id;
