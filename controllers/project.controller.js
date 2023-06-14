@@ -204,22 +204,29 @@ export async function updateCollaborator(req, res) {
         //store emails of every collaborator in an array
         const collaboratorsEmails=await projectCollaborators.map((projectCollaborator)=>(projectCollaborator.email))
 
+        //Array of promises to send invitation mails
+        let sendMailsPromise;
+
         //iterating on every email we got
         emails.forEach(async (email)=>{
           //check this email is present in array of collaborators list of this project
           const isPresent= collaboratorsEmails.includes(email);
           if(!isPresent){
-
-            //Invite new Collaborator with this email
-
             // creating collaborator in db
-            await Collaborators.create({
+            let collaborator=await Collaborators.create({
               email:email,
               projectId:req.params.projectId,
               status:'Invited'
             });
+
+            //Invite new Collaborator with this email
+            sendMailsPromise.push(sendCollabInvitationLink(collaborator.email,collaborator._id,collaborator.projectId));
+            
           }
         })
+
+        //send mails
+        Promise.all(sendMailsPromise);
 
         //checking if any removed collaborators and deleting
         collaboratorsEmails.forEach(async (collaboratorEmail)=>{
