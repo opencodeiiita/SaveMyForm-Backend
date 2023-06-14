@@ -220,7 +220,7 @@ export async function updateCollaborator(req, res) {
             });
 
             //Invite new Collaborator with this email
-            sendMailsPromise.push(sendCollabInvitationLink(newcollaborator.email,newcollaborator._id,newcollaborator.projectId));
+            sendMailsPromise.push(sendCollabInvitationLink(newcollaborator.email,newcollaborator._id,project.name));
             
           }
         })
@@ -244,19 +244,4 @@ export async function updateCollaborator(req, res) {
       console.log(error);
       return response_500(res, 'Server error', error);
      }
-}
-
-function inviteCollaborators(
-  email,
-  projectId,
-  projectName,
-  userName,
-  userEmail,
-) {
-  const obj = {
-    projectId,
-    collaborators: email.join(';'),
-  };
-  const secret = getJwt(obj);
-  sendCollabInvitationLink(email, secret, projectName, userName, userEmail);
 }
