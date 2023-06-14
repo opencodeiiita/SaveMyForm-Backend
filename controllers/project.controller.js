@@ -213,14 +213,14 @@ export async function updateCollaborator(req, res) {
           const isPresent= collaboratorsEmails.includes(email);
           if(!isPresent){
             // creating collaborator in db
-            let collaborator=await Collaborators.create({
+            let newcollaborator=await Collaborators.create({
               email:email,
               projectId:req.params.projectId,
               status:'Invited'
             });
 
             //Invite new Collaborator with this email
-            sendMailsPromise.push(sendCollabInvitationLink(collaborator.email,collaborator._id,collaborator.projectId));
+            sendMailsPromise.push(sendCollabInvitationLink(newcollaborator.email,newcollaborator._id,newcollaborator.projectId));
             
           }
         })
