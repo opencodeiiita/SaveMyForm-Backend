@@ -20,7 +20,10 @@ export async function createProject(req, res) {
   if (!req.body.name) return response_400(res, 'Project name is required');
   const user = await User.findById(req.user._id);
   if (user.projects.length >= 5) {
-    return response_400(res, 'Maximum number of 5 projects reached for this user.');
+    return response_400(
+      res,
+      'Maximum number of 5 projects reached for this user.',
+    );
   }
   const newProject = Project({
     name: req.body.name,
@@ -39,13 +42,11 @@ export async function createProject(req, res) {
   console.log(newProject);
   //number of origins of project greater than 3 not allowed
   if (newProject.allowedOrigins.length > 3) {
-    return response_400(res, 'Number of allowed origins cannot be greater than 3');
+    return response_400(
+      res,
+      'Number of allowed origins cannot be greater than 3',
+    );
   }
-  //number of collaborators of the project greater than 5 not allowed
-  if (req.body.collaborators.length > 5) {
-    return response_400(res, 'Number of collaborators cannot be greater than 5');
-  }
-
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
@@ -115,14 +116,20 @@ export async function updateProject(req, res) {
     }
     if (req.body.allowedOrigins) {
       if (req.body.allowedOrigins.length > 3) {
-        return response_400(res, 'Number of allowed origins cannot be greater than 3');
+        return response_400(
+          res,
+          'Number of allowed origins cannot be greater than 3',
+        );
       }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
-  
+
     if (req.body.collaborators) {
       if (req.body.collaborators.length > 5) {
-        return response_400(res, 'Number of collaborators cannot be greater than 5');
+        return response_400(
+          res,
+          'Number of collaborators cannot be greater than 5',
+        );
       }
       inviteCollaborators(
         req.body.collaborators,
@@ -132,7 +139,6 @@ export async function updateProject(req, res) {
         req.user.email,
       );
     }
-
 
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
@@ -160,7 +166,7 @@ export async function projectDashboard(req, res) {
 
   try {
     project = await Project.findOne({ projectId: req.params.id })
-      .populate('forms', 'formId name submissions createdAt updatedAt -_id')
+      .populate('forms', 'formId name submission createdAt updatedAt -_id')
       .populate('owner', 'name email')
       .populate('collaborators', 'name email -_id')
       .select('-_id -createdAt -updatedAt -__v');
@@ -173,7 +179,7 @@ export async function projectDashboard(req, res) {
     delete project.hasRecaptcha;
     project.form_count = project?.forms?.length;
     project.forms.forEach((form) => {
-      form.submission_count = form?.submissions?.length;
+      form.submission_count = form?.submission?.length;
       form.last_updated = form.updatedAt;
       form.date_created = form.createdAt;
       form.id = form.formId;
@@ -189,54 +195,59 @@ export async function projectDashboard(req, res) {
 }
 
 export async function updateCollaborator(req, res) {
-     try {
-      let project=await Project.findById(req.params.projectId).populate('owner', 'name email')
-      let is_owner = String(project.owner._id) === String(req.user._id);
-      if(!is_owner){
-        response_401('The user is not the owner of project.');
-      }else{
-        //storing emails we got in an array
-        const emails=req.body.collaborators;
+  try {
+    let project = await Project.findById(req.params.projectId).populate(
+      'owner',
+      'name email',
+    );
+    let is_owner = String(project.owner._id) === String(req.user._id);
+    if (!is_owner) {
+      response_401('The user is not the owner of project.');
+    } else {
+      //storing emails we got in an array
+      const emails = req.body.collaborators;
 
-        // finding all collaborators with projectId
-        const projectCollaborators=await Collaborators.find({projectId:req.params.projectId});
+      // finding all collaborators with projectId
+      const projectCollaborators = await Collaborators.find({
+        projectId: req.params.projectId,
+      });
 
-        //store emails of every collaborator in an array
-        const collaboratorsEmails=await projectCollaborators.map((projectCollaborator)=>(projectCollaborator.email))
+      //store emails of every collaborator in an array
+      const collaboratorsEmails = await projectCollaborators.map(
+        (projectCollaborator) => projectCollaborator.email,
+      );
 
-        //iterating on every email we got
-        emails.forEach(async (email)=>{
-          //check this email is present in array of collaborators list of this project
-          const isPresent= collaboratorsEmails.includes(email);
-          if(!isPresent){
+      //iterating on every email we got
+      emails.forEach(async (email) => {
+        //check this email is present in array of collaborators list of this project
+        const isPresent = collaboratorsEmails.includes(email);
+        if (!isPresent) {
+          //Invite new Collaborator with this email
 
-            //Invite new Collaborator with this email
+          // creating collaborator in db
+          await Collaborators.create({
+            email: email,
+            projectId: req.params.projectId,
+            status: 'Invited',
+          });
+        }
+      });
 
-            // creating collaborator in db
-            await Collaborators.create({
-              email:email,
-              projectId:req.params.projectId,
-              status:'Invited'
-            });
-          }
-        })
-
-        //checking if any removed collaborators and deleting
-        collaboratorsEmails.forEach(async (collaboratorEmail)=>{
-          const isPresent= emails.includes(collaboratorEmail);
-          if(!isPresent){
-            await Collaborators.findOneAndDelete({
-              email:collaboratorEmail,
-              projectId:req.params.projectId
-            })
-          }
-        })
-
-      }
-     } catch (error) {
-      console.log(error);
-      return response_500(res, 'Server error', error);
-     }
+      //checking if any removed collaborators and deleting
+      collaboratorsEmails.forEach(async (collaboratorEmail) => {
+        const isPresent = emails.includes(collaboratorEmail);
+        if (!isPresent) {
+          await Collaborators.findOneAndDelete({
+            email: collaboratorEmail,
+            projectId: req.params.projectId,
+          });
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return response_500(res, 'Server error', error);
+  }
 }
 
 function inviteCollaborators(
