@@ -226,7 +226,7 @@ export async function updateCollaborator(req, res) {
         })
 
         //send mails
-        Promise.all(sendMailsPromise);
+       await Promise.all(sendMailsPromise);
 
         //checking if any removed collaborators and deleting
         collaboratorsEmails.forEach(async (collaboratorEmail)=>{
