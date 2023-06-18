@@ -190,7 +190,7 @@ export async function projectDashboard(req, res) {
 
 export async function updateCollaborator(req, res) {
      try {
-      let project=await Project.findById(req.params.projectId).populate('owner', 'name email')
+      let project=await Project.findOne({ projectId: req.params.projectId }).populate('owner', 'name email')
       let is_owner = String(project.owner._id) === String(req.user._id);
       if(!is_owner){
         response_401('The user is not the owner of project.');
