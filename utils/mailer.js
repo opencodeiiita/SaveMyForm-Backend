@@ -67,9 +67,7 @@ export function sendVerificationLink(email, secret, ip) {
 export function sendCollabInvitationLink(
   email,
   secret,
-  projectName,
-  userName,
-  userEmail,
+  projectName
 ) {
   let link = BASE_URL + '/collab/' + secret;
   const handlebarOptions = {
@@ -88,8 +86,7 @@ export function sendCollabInvitationLink(
     context: {
       url: link,
       projectName,
-      userName,
-      userEmail,
+      userEmail:email
     },
   };
   transporter.sendMail(mailOptions, (err, info) => {
