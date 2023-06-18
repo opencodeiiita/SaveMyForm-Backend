@@ -36,6 +36,9 @@ app.use('/project', projectRoutes);
 import userRoutes from './routes/user.routes.js';
 app.use('/user', userRoutes);
 
+import formSubmissionRoutes from './routes/formSubmission.routes.js';
+app.use('/main', formSubmissionRoutes);
+
 app.listen(
   process.env.PORT ? process.env.PORT : 8080,
   process.env.HOST ? process.env.HOST : '127.0.0.1',

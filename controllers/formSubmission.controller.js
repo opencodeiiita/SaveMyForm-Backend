@@ -11,7 +11,7 @@ import {
 import Form from '../models/form.model.js';
 export async function createFormSubmission(req, res) {
   try {
-    const encryptedStr = req.params.encryptedStr;
+    const encryptedStr = req.query.formRef;
     const decryptedStr = await dcryptString(encryptedStr);
     const { formId, submisssionLinkGeneratedAt } = JSON.parse(decryptedStr);
     const form = await Form.findOne({ formId: formId });

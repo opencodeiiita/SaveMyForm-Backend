@@ -22,14 +22,11 @@ export function getVerificationLink(req, res) {
 }
 
 export async function updateUser(req, res) {
-  if (!(req.body.name && req.body.email && req.body.password))
-    return response_400(res, 'All required fields not present');
-  if (req.user.passwordHash !== '') {
+  try {
+    if (!(req.body.name && req.body.email))
+      return response_400(res, 'All required fields not present');
     if (!verifycaptcha(req.body.recaptcha_token))
       return response_400(res, 'Captcha not verified');
-    const password = await hash_password(req.body.password);
-    if (password !== req.user.passwordHash)
-      return response_400(res, 'Wrong Password');
     if (req.body.email !== req.user.email) {
       if (!validator.isEmail(req.body.email))
         return response_400(res, 'Invalid email id');
@@ -42,11 +39,8 @@ export async function updateUser(req, res) {
       name: updatedUser.name,
       email: updatedUser.email,
     });
-  } else {
-    return response_400(
-      res,
-      'You will need to create a password before changing these settings',
-    );
+  } catch (err) {
+    return response_400(res, 'Error updating user info');
   }
 }
 

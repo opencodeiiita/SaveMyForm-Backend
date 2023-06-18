@@ -20,7 +20,10 @@ export async function createProject(req, res) {
   if (!req.body.name) return response_400(res, 'Project name is required');
   const user = await User.findById(req.user._id);
   if (user.projects.length >= 5) {
-    return response_400(res, 'Maximum number of 5 projects reached for this user.');
+    return response_400(
+      res,
+      'Maximum number of 5 projects reached for this user.',
+    );
   }
   const newProject = Project({
     name: req.body.name,
@@ -39,13 +42,11 @@ export async function createProject(req, res) {
   console.log(newProject);
   //number of origins of project greater than 3 not allowed
   if (newProject.allowedOrigins.length > 3) {
-    return response_400(res, 'Number of allowed origins cannot be greater than 3');
+    return response_400(
+      res,
+      'Number of allowed origins cannot be greater than 3',
+    );
   }
-  //number of collaborators of the project greater than 5 not allowed
-  if (req.body.collaborators.length > 5) {
-    return response_400(res, 'Number of collaborators cannot be greater than 5');
-  }
-
   try {
     await newProject.save();
     req.user.projects.push(newProject._id);
@@ -115,14 +116,20 @@ export async function updateProject(req, res) {
     }
     if (req.body.allowedOrigins) {
       if (req.body.allowedOrigins.length > 3) {
-        return response_400(res, 'Number of allowed origins cannot be greater than 3');
+        return response_400(
+          res,
+          'Number of allowed origins cannot be greater than 3',
+        );
       }
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
-  
+
     if (req.body.collaborators) {
       if (req.body.collaborators.length > 5) {
-        return response_400(res, 'Number of collaborators cannot be greater than 5');
+        return response_400(
+          res,
+          'Number of collaborators cannot be greater than 5',
+        );
       }
       inviteCollaborators(
         req.body.collaborators,
@@ -132,7 +139,6 @@ export async function updateProject(req, res) {
         req.user.email,
       );
     }
-
 
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
@@ -160,7 +166,7 @@ export async function projectDashboard(req, res) {
 
   try {
     project = await Project.findOne({ projectId: req.params.id })
-      .populate('forms', 'formId name submissions createdAt updatedAt -_id')
+      .populate('forms', 'formId name submission createdAt updatedAt -_id')
       .populate('owner', 'name email')
       .populate('collaborators', 'name email -_id')
       .select('-_id -createdAt -updatedAt -__v');
@@ -173,7 +179,7 @@ export async function projectDashboard(req, res) {
     delete project.hasRecaptcha;
     project.form_count = project?.forms?.length;
     project.forms.forEach((form) => {
-      form.submission_count = form?.submissions?.length;
+      form.submission_count = form?.submission?.length;
       form.last_updated = form.updatedAt;
       form.date_created = form.createdAt;
       form.id = form.formId;

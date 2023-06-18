@@ -87,6 +87,7 @@ export async function createForm(req, res) {
     return response_400(res, 'Name cannot be an empty string');
   const projectId = req.params.projectId;
   const project = await Project.findOne({ projectId });
+  console.log(project);
   if (!project) return response_400(res, 'No project found with this id');
 
   //Mongoose object id cannot be equated directly so i converted them into string and checked that.
@@ -109,18 +110,17 @@ export async function createForm(req, res) {
         submisssionLinkGeneratedAt,
       }),
     );
-    let url = `${hostUrl}/main/submit/?formRef=${encryptedStr}`;
+    let url = `${hostUrl}/main/submit?formRef=${encryptedStr}`;
     let newForm = await Form.create({
       name: req.body.name,
       project: project._id,
       schema: req.body.schema,
       hasFileField: req.body.hasFileField,
       hasRecaptchaVerification: req.body.hasRecaptcha,
-      submissions: [],
-      formId: generateRandomString(16),
+      formId: formId,
       submisssionLinkGeneratedAt,
     });
-
+    console.log(newForm);
     Project.findByIdAndUpdate(
       project._id,
       { forms: [...project.forms, newForm._id] },
@@ -136,6 +136,7 @@ export async function createForm(req, res) {
       submisssionUrl: url,
     });
   } catch (error) {
+    console.log(error);
     return response_500(res, 'Server Error', error);
   }
 }
