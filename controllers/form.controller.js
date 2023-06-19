@@ -104,7 +104,7 @@ export async function createForm(req, res) {
     let formId = generateRandomString(16);
     let submisssionLinkGeneratedAt = Date.now();
     const { hostUrl } = req.body;
-    let encryptedStr = await encryptString(
+    let encryptedStr = encryptString(
       JSON.stringify({
         formId,
         submisssionLinkGeneratedAt,

@@ -12,14 +12,18 @@ import Form from '../models/form.model.js';
 export async function createFormSubmission(req, res) {
   try {
     const encryptedStr = req.query.formRef;
-    const decryptedStr = await dcryptString(encryptedStr);
+    const decryptedStr = dcryptString(encryptedStr);
+    console.log(decryptedStr);
     const { formId, submisssionLinkGeneratedAt } = JSON.parse(decryptedStr);
     const form = await Form.findOne({ formId: formId });
     if (!form) return response_400(res, 'Form not found');
-    if (form.submisssionLinkGeneratedAt !== submisssionLinkGeneratedAt)
+    let incomingTime = new Date(form.submisssionLinkGeneratedAt).getTime();
+    console.log(incomingTime);
+    console.log(submisssionLinkGeneratedAt);
+    if (incomingTime !== submisssionLinkGeneratedAt)
       return response_400(res, 'Link expired');
     const schema = form.schema;
-    const submissionData = req.body.data;
+    const submissionData = req.body;
     const isValid = validateSchema(schema, submissionData);
     if (!isValid) return response_400(res, 'Invalid data');
     const submission = await prisma.formSubmission.create({
