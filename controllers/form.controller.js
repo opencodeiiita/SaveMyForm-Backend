@@ -143,7 +143,7 @@ export async function createForm(req, res) {
 export async function getForm(req, res) {
   try {
     const { formId } = req.params;
-    const form = await Form.aggregate([
+    let form = await Form.aggregate([
       {
         $match: {
           formId: formId,
@@ -193,8 +193,17 @@ export async function getForm(req, res) {
         },
       },
     ]);
+    form = form[0];
     if (!form) return response_400(res, 'Form not found');
     const formSubmissions = await prisma.formSubmission.findMany({
+      select: {
+        id: true,
+        data: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         formId: formId,
       },

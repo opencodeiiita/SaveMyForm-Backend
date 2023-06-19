@@ -173,10 +173,10 @@ export async function projectDashboard(req, res) {
     project = project.toJSON();
     project.is_owner = String(project.owner._id) === String(req.user._id);
     delete project.owner._id;
-    project.allowRecaptcha = project.hasRecaptcha;
+    project.hasRecaptcha = project.allowRecaptcha;
+    delete project.allowRecaptcha;
     project.id = project.projectId;
     delete project.projectId;
-    delete project.hasRecaptcha;
     project.form_count = project?.forms?.length;
     project.forms.forEach((form) => {
       form.submission_count = form?.submission?.length;
@@ -187,6 +187,9 @@ export async function projectDashboard(req, res) {
       delete form.updatedAt;
       delete form.createdAt;
     });
+    project.forms.sort((a, b) => {
+      return b.date_created - a.date_created;
+    });
     return response_200(res, 'Project Dashboard', project);
   } catch (error) {
     console.log(error);
@@ -195,59 +198,69 @@ export async function projectDashboard(req, res) {
 }
 
 export async function updateCollaborator(req, res) {
-     try {
-      let project=await Project.findOne({ projectId: req.params.projectId }).populate('owner', 'name email')
-      let is_owner = String(project.owner._id) === String(req.user._id);
-      if(!is_owner){
-        response_401('The user is not the owner of project.');
-      }else{
-        //storing emails we got in an array
-        const emails=req.body.collaborators;
+  try {
+    let project = await Project.findOne({
+      projectId: req.params.projectId,
+    }).populate('owner', 'name email');
+    let is_owner = String(project.owner._id) === String(req.user._id);
+    if (!is_owner) {
+      response_401('The user is not the owner of project.');
+    } else {
+      //storing emails we got in an array
+      const emails = req.body.collaborators;
 
-        // finding all collaborators with projectId
-        const projectCollaborators=await Collaborators.find({projectId:req.params.projectId});
+      // finding all collaborators with projectId
+      const projectCollaborators = await Collaborators.find({
+        projectId: req.params.projectId,
+      });
 
-        //store emails of every collaborator in an array
-        const collaboratorsEmails=await projectCollaborators.map((projectCollaborator)=>(projectCollaborator.email))
+      //store emails of every collaborator in an array
+      const collaboratorsEmails = await projectCollaborators.map(
+        (projectCollaborator) => projectCollaborator.email,
+      );
 
-        //Array of promises to send invitation mails
-        let sendMailsPromise;
+      //Array of promises to send invitation mails
+      let sendMailsPromise;
 
-        //iterating on every email we got
-        emails.forEach(async (email)=>{
-          //check this email is present in array of collaborators list of this project
-          const isPresent= collaboratorsEmails.includes(email);
-          if(!isPresent){
-            // creating collaborator in db
-            let newcollaborator=await Collaborators.create({
-              email:email,
-              projectId:req.params.projectId,
-              status:'Invited'
-            });
+      //iterating on every email we got
+      emails.forEach(async (email) => {
+        //check this email is present in array of collaborators list of this project
+        const isPresent = collaboratorsEmails.includes(email);
+        if (!isPresent) {
+          // creating collaborator in db
+          let newcollaborator = await Collaborators.create({
+            email: email,
+            projectId: req.params.projectId,
+            status: 'Invited',
+          });
 
-            //Invite new Collaborator with this email
-            sendMailsPromise.push(sendCollabInvitationLink(newcollaborator.email,newcollaborator._id,project.name));
-            
-          }
-        })
+          //Invite new Collaborator with this email
+          sendMailsPromise.push(
+            sendCollabInvitationLink(
+              newcollaborator.email,
+              newcollaborator._id,
+              project.name,
+            ),
+          );
+        }
+      });
 
-        //send mails
-       await Promise.all(sendMailsPromise);
+      //send mails
+      await Promise.all(sendMailsPromise);
 
-        //checking if any removed collaborators and deleting
-        collaboratorsEmails.forEach(async (collaboratorEmail)=>{
-          const isPresent= emails.includes(collaboratorEmail);
-          if(!isPresent){
-            await Collaborators.findOneAndDelete({
-              email:collaboratorEmail,
-              projectId:req.params.projectId
-            })
-          }
-        })
-
-      }
-     } catch (error) {
-      console.log(error);
-      return response_500(res, 'Server error', error);
-     }
+      //checking if any removed collaborators and deleting
+      collaboratorsEmails.forEach(async (collaboratorEmail) => {
+        const isPresent = emails.includes(collaboratorEmail);
+        if (!isPresent) {
+          await Collaborators.findOneAndDelete({
+            email: collaboratorEmail,
+            projectId: req.params.projectId,
+          });
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return response_500(res, 'Server error', error);
+  }
 }

@@ -16,6 +16,4 @@ model FormSubmission {
   data      Json
   formId    String
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
 }
