@@ -182,17 +182,14 @@ export async function getForm(req, res) {
       },
       {
         $project: {
-          project: 0,
           formId: 1,
-          _id: 0,
           name: 1,
           is_owner: 1,
           owner: 1,
           hasRecaptchaVerification: 1,
           hasFileField: 1,
-          schema: 0,
-          submission: 0,
           submisssionLinkGeneratedAt: 1,
+          'project.name': 1,
         },
       },
     ]);
@@ -203,8 +200,10 @@ export async function getForm(req, res) {
       },
     });
     form.submission = formSubmissions;
+    console.log(form);
     return response_200(res, 'OK', form);
   } catch (error) {
+    console.log(error);
     return response_500(res, 'Server Error', error);
   }
 }

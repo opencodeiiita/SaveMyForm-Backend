@@ -15,5 +15,5 @@ router.get('/', greet);
 router.post('/new/:projectId', verifiedMiddleware, createForm);
 router.patch('/update/:id', verifiedMiddleware, updateForm);
 router.delete('/', verifiedMiddleware, deleteForm);
-router.get('/:formId', getForm);
+router.get('/dashboard/:formId', verifiedMiddleware, getForm);
 export default router;
