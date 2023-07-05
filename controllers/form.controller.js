@@ -5,12 +5,13 @@ import {
   response_401,
   response_500,
 } from '../utils/responseCodes.js';
-import verifycaptcha from '../utils/recaptcha.js';
+import { verifycaptcha } from '../utils/recaptcha.js';
 import { hash_password, encryptString } from '../utils/password.js';
 import Form from '../models/form.model.js';
 import Project from '../models/project.model.js';
 import { generateRandomString } from '../utils/generateRandomString.js';
 import { prisma } from '../config/sql.config.js';
+
 export async function updateForm(req, res) {
   const id = req.params.id;
 
@@ -195,27 +196,41 @@ export async function getForm(req, res) {
     ]);
     form = form[0];
     if (!form) return response_400(res, 'Form not found');
-    const formSubmissions = await prisma.formSubmission.findMany({
-      select: {
-        id: true,
-        data: true,
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      where: {
-        formId: formId,
-      },
-    });
-    form.submission = formSubmissions;
-    console.log(form);
     return response_200(res, 'OK', form);
   } catch (error) {
     console.log(error);
     return response_500(res, 'Server Error', error);
   }
 }
+
+export async function getFormSubmissions(req, res) {
+  try {
+    const { formId } = req.params;
+    const { limit, skip } = req.query;
+
+    const formSubmissions = await prisma.formSubmission.findMany({
+      where: {
+        formId: formId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        data: true,
+        createdAt: true,
+      },
+      take: limit,
+      skip: skip,
+    });
+
+    return response_200(res, 'OK', formSubmissions);
+  } catch (error) {
+    console.log(error);
+    return response_500(res, 'Server Error', error);
+  }
+}
+
 export async function deleteForm(req, res) {
   try {
     const id = req.body.id;

@@ -7,7 +7,7 @@ import {
 } from '../utils/responseCodes.js';
 import { hash_password, getJwt } from '../utils/password.js';
 import User from '../models/user.model.js';
-import verifycaptcha from '../utils/recaptcha.js';
+import { verifycaptcha } from '../utils/recaptcha.js';
 import validator from 'validator';
 import { OAuth2Client } from 'google-auth-library';
 const client = new OAuth2Client(
@@ -64,7 +64,7 @@ export async function signUp(req, res) {
   if (checkUser) return response_400(res, 'Email already in use');
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha was found incorrect');
-    
+
   const password = await hash_password(req.body.password);
   let newUser = User({
     email,

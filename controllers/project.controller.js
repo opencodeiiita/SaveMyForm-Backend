@@ -2,7 +2,7 @@ import Project from '../models/project.model.js';
 import User from '../models/user.model.js';
 import Form from '../models/form.model.js';
 import Collaborators from '../models/invitedCollaborators.model.js';
-import verifycaptcha from '../utils/recaptcha.js';
+import { verifycaptcha } from '../utils/recaptcha.js';
 import { sendCollabInvitationLink } from '../utils/mailer.js';
 import { getJwt, hash_password } from '../utils/password.js';
 import {

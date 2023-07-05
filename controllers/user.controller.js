@@ -1,7 +1,7 @@
 import { sendVerificationLink } from '../utils/mailer.js';
 import { getJwt, hash_password } from '../utils/password.js';
 import { response_200, response_400 } from '../utils/responseCodes.js';
-import verifycaptcha from '../utils/recaptcha.js';
+import { verifycaptcha } from '../utils/recaptcha.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
