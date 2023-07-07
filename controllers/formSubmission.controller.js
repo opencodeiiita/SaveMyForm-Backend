@@ -14,7 +14,6 @@ import { verifySubmissionRecaptcha } from '../utils/recaptcha.js';
 
 export async function createFormSubmission(req, res) {
   try {
-    
     const grcToken = req.body['grc-token'];
     const encryptedStr = req.query.formRef;
     const decryptedStr = dcryptString(encryptedStr);
@@ -23,13 +22,11 @@ export async function createFormSubmission(req, res) {
     const form = await Form.findOne({ formId: formId }).populate('project');
     if (!form) return response_400(res, 'Form not found');
 
-    
     let incomingTime = new Date(form.submisssionLinkGeneratedAt).getTime();
     if (incomingTime !== submisssionLinkGeneratedAt)
       return response_400(res, 'Link expired');
 
-  
-    if (form.project.allowRecaptcha) {
+    if (form.project.allowRecaptcha && form.hasRecaptchaVerificatio) {
       if (!grcToken) return response_401(res, 'Recaptcha token not found');
       const recaptcha = await verifySubmissionRecaptcha(
         grcToken,
@@ -38,13 +35,13 @@ export async function createFormSubmission(req, res) {
       if (!recaptcha) return response_401(res, 'Recaptcha verification failed');
     }
 
-
-    const allowedOrigins = form.project.allowedOrigins;
-    if (allowedOrigins.length > 0) {
-      const origin = req.headers.origin;
-      if (!allowedOrigins.includes(origin))
-        return response_401(res, 'Origin not allowed');
-    }
+    // const allowedOrigins = form.project.allowedOrigins;
+    // console.log(allowedOrigins);
+    // if (allowedOrigins.length > 0) {
+    //   const origin = req.headers.origin;
+    //   if (!allowedOrigins.includes(origin))
+    //     return response_401(res, 'Origin not allowed');
+    // }
 
     const schema = form.schema;
     const submissionData = req.body;

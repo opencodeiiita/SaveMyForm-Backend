@@ -207,8 +207,14 @@ export async function getFormSubmissions(req, res) {
   try {
     const { formId } = req.params;
     const { limit, skip } = req.query;
-
-    const formSubmissions = await prisma.formSubmission.findMany({
+    const submissionCountPromise = prisma.formSubmission.count({
+      where: {
+        formId: formId,
+      },
+    });
+    const formSubmissionsPromise = prisma.formSubmission.findMany({
+      take: parseInt(limit),
+      skip: parseInt(skip),
       where: {
         formId: formId,
       },
@@ -220,11 +226,15 @@ export async function getFormSubmissions(req, res) {
         data: true,
         createdAt: true,
       },
-      take: limit,
-      skip: skip,
     });
-
-    return response_200(res, 'OK', formSubmissions);
+    let [submissionCount, formSubmissions] = await Promise.all([
+      submissionCountPromise,
+      formSubmissionsPromise,
+    ]);
+    return response_200(res, 'OK', {
+      submissions: formSubmissions,
+      totalSubmissions: submissionCount,
+    });
   } catch (error) {
     console.log(error);
     return response_500(res, 'Server Error', error);
@@ -276,6 +286,28 @@ export async function generateSubmissionLink(req, res) {
     );
     let url = `${hostUrl}/main/submit/?formRef=${encryptedStr}`;
     return response_200(res, 'OK', { submissionUrl: url });
+  } catch (error) {
+    return response_500(res, 'Server Error', error);
+  }
+}
+export async function generateCSV(req, res) {
+  try {
+    const { formId } = req.params;
+    const formSubmissions = await prisma.formSubmission.findMany({
+      where: {
+        formId: formId,
+      },
+      select: {
+        data: true,
+      },
+    });
+    let csv = 'data:text/csv;charset=utf-8,';
+    csv += Object.keys(formSubmissions[0].data).join(',') + '\n';
+    formSubmissions.forEach((submission) => {
+      csv += Object.values(submission.data).join(',') + '\n';
+    });
+    let encodeUri = encodeURI(csv);
+    return response_200(res, 'OK', { encodeUri });
   } catch (error) {
     return response_500(res, 'Server Error', error);
   }
