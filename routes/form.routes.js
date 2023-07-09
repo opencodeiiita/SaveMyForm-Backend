@@ -8,6 +8,7 @@ import {
   updateForm,
   getForm,
   getFormSubmissions,
+  generateCSV,
 } from '../controllers/form.controller.js';
 const router = Router();
 
@@ -18,4 +19,5 @@ router.patch('/update/:id', verifiedMiddleware, updateForm);
 router.delete('/', verifiedMiddleware, deleteForm);
 router.get('/dashboard/:formId', verifiedMiddleware, getForm);
 router.get('/submissions/:formId', verifiedMiddleware, getFormSubmissions);
+router.get('/csv/:formId', verifiedMiddleware, generateCSV);
 export default router;
