@@ -16,7 +16,7 @@ const router = Router();
 router.get('/', greet);
 router.post('/new/:projectId', verifiedMiddleware, createForm);
 router.patch('/update/:id', verifiedMiddleware, updateForm);
-router.delete('/', verifiedMiddleware, deleteForm);
+router.delete('/:formId', verifiedMiddleware, deleteForm);
 router.get('/dashboard/:formId', verifiedMiddleware, getForm);
 router.get('/submissions/:formId', verifiedMiddleware, getFormSubmissions);
 router.get('/csv/:formId', verifiedMiddleware, generateCSV);
