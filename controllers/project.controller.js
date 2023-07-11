@@ -264,3 +264,19 @@ export async function updateCollaborator(req, res) {
     return response_500(res, 'Server error', error);
   }
 }
+
+export async function updateCollaboratorStatus(req, res) {
+  try {
+    if(req.body.userAccepted){
+      let collaborator=await Collaborators.findById(req.body.collaboratorId);
+      collaborator.status='Accepted'
+      collaborator.save();
+    }
+    else{
+      await Collaborators.findByIdAndDelete(req.body.collaboratorId);
+    } 
+  } catch (error) {
+    console.log(error);
+    return response_500(res, 'Server error', error);
+  }
+}
