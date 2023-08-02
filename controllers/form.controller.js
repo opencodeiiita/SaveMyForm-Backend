@@ -11,10 +11,10 @@ import Form from '../models/form.model.js';
 import Project from '../models/project.model.js';
 import { generateRandomString } from '../utils/generateRandomString.js';
 import { prisma } from '../config/sql.config.js';
+import mongoose from 'mongoose';
 
 export async function updateForm(req, res) {
   const id = req.params.id;
-
   const {
     name,
     hasRecaptcha,
@@ -26,51 +26,105 @@ export async function updateForm(req, res) {
 
   if (
     !name ||
-    !hasRecaptcha ||
-    !hasFileField ||
+    hasRecaptcha === undefined ||
+    hasFileField === undefined ||
     !schema ||
     !password ||
     !recaptcha_token
   ) {
-    response_400(res, 'Fields missing for updation');
+    return response_400(res, 'Fields missing for updation');
   }
 
   if (!verifycaptcha(recaptcha_token))
     return response_400(res, 'Captcha not verified');
-  password = await hash_password(password);
-  let form = await Form.findById(id);
 
-  form = form
-    .populate({
-      path: 'project',
-      select: 'owner',
-    })
-    .populate({
-      path: 'project.owner',
-      select: '_id name email passwordHash',
-    });
-
-  if (password !== form.project.owner.passwordHash)
-    response_400(res, 'User is not the owner');
-
-  form = await form.updateOne({
-    name: name,
-    hasRecaptchaVerification: hasRecaptcha,
-    hasFileField: hasFileField,
-    schema: schema,
-  });
-
-  form = await form.project({
-    formId: 1,
-    name: 1,
-    hasRecaptchaVerification: 1,
-    is_owner: { $eq: [req.user._id, '$$$project.owner._id'] },
-    owner: {
-      name: '$$$project.owner.name',
-      email: '$$$project.owner.email',
+  const passwordHash = await hash_password(password);
+  let form = await Form.aggregate([
+    {
+      $match: {
+        formId: id,
+      },
     },
+    {
+      $lookup: {
+        from: 'projects',
+        localField: 'project',
+        foreignField: '_id',
+        as: 'project',
+      },
+    },
+    {
+      $unwind: '$project',
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'project.owner',
+        foreignField: '_id',
+        as: 'project.owner',
+      },
+    },
+    {
+      $unwind: '$project.owner',
+    },
+    {
+      $project: {
+        name: 1,
+        hasRecaptchaVerification: 1,
+        hasFileField: 1,
+        schema: 1,
+        project: {
+          owner: {
+            name: 1,
+            email: 1,
+            passwordHash: 1,
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        'project.owner.passwordHash': passwordHash,
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        hasRecaptchaVerification: 1,
+        hasFileField: 1,
+        schema: 1,
+      },
+    },
+  ]);
+
+  if (!form) return response_400(res, 'User is not the owner');
+
+  const updatedForm = await Form.findOneAndUpdate(
+    { formId: id },
+    {
+      name: name,
+      hasRecaptchaVerification: hasRecaptcha,
+      hasFileField: hasFileField,
+      schema: schema,
+    },
+    { new: true },
+  ).select(
+    'formId name hasRecaptchaVerification hasFileField schema submisssionLinkGeneratedAt',
+  );
+
+  let submisssionLinkGeneratedAt = updatedForm.submisssionLinkGeneratedAt;
+  const { hostUrl } = req.body;
+  let encryptedStr = encryptString(
+    JSON.stringify({
+      formId: id,
+      submisssionLinkGeneratedAt,
+    }),
+  );
+  let url = `${hostUrl}/main/submit?formRef=${encryptedStr}`;
+  response_200(res, 'form sucessfully updated', {
+    ...updatedForm,
+    submissionLink: url,
   });
-  response_200(res, 'form sucessfully updated', form);
 }
 
 export async function createForm(req, res) {
@@ -88,7 +142,6 @@ export async function createForm(req, res) {
     return response_400(res, 'Name cannot be an empty string');
   const projectId = req.params.projectId;
   const project = await Project.findOne({ projectId });
-  console.log(project);
   if (!project) return response_400(res, 'No project found with this id');
 
   //Mongoose object id cannot be equated directly so i converted them into string and checked that.
@@ -121,7 +174,6 @@ export async function createForm(req, res) {
       formId: formId,
       submisssionLinkGeneratedAt,
     });
-    console.log(newForm);
     Project.findByIdAndUpdate(
       project._id,
       { forms: [...project.forms, newForm._id] },
@@ -187,6 +239,7 @@ export async function getForm(req, res) {
           name: 1,
           is_owner: 1,
           owner: 1,
+          schema: 1,
           hasRecaptchaVerification: 1,
           hasFileField: 1,
           submisssionLinkGeneratedAt: 1,
@@ -243,32 +296,71 @@ export async function getFormSubmissions(req, res) {
 
 export async function deleteForm(req, res) {
   try {
-    const id = req.body.id;
-    const form = await Form.findById(id)
-      .populate({
-        path: 'project',
-        select: 'owner',
-      })
-      .populate({
-        path: 'project.owner',
-        select: '_id name email passwordHash',
-      });
-    if (!form) {
-      return res.status(400).json({ msg: 'Form not found' });
-    }
-    const isOwner = req.user._id === form.project.owner._id;
-    if (!isOwner) {
-      return res.status(401).json({ msg: 'Unauthorized' });
-    }
+    const { formId } = req.params;
     const password = req.body.password;
-    password = await hash_password(password); // Assuming the password is provided in the request body
-    if (password !== form.project.owner.passwordHash) {
-      return res.status(400).json({ msg: 'User is not the owner' });
+
+    const [form] = await Form.aggregate([
+      {
+        $match: {
+          formId: formId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'projects',
+          localField: 'project',
+          foreignField: '_id',
+          as: 'project',
+        },
+      },
+      {
+        $unwind: '$project',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'project.owner',
+          foreignField: '_id',
+          as: 'project.owner',
+        },
+      },
+      {
+        $unwind: '$project.owner',
+      },
+      {
+        $project: {
+          formId: 1,
+          name: 1,
+          'project.owner': 1,
+        },
+      },
+    ]);
+
+    if (!form) {
+      return response_400(res, 'Form not found');
     }
-    await form.deleteOne();
-    res.status(200).json({ data: form, msg: 'Form deleted successfully' });
+    const isOwner = req.user._id.equals(form.project.owner._id);
+    if (!isOwner) {
+      return response_401(res, 'Unauthorized');
+    }
+
+    const hash = await hash_password(password);
+    const isPasswordValid = hash === form.project.owner.passwordHash;
+
+    if (!isPasswordValid) {
+      return response_400(res, 'Invalid password');
+    }
+
+    await Form.deleteOne({ formId });
+    await prisma.formSubmission.deleteMany({
+      where: {
+        formId: formId,
+      },
+    });
+    return response_200(res, 'Form deleted successfully');
   } catch (error) {
-    res.status(500).json({ msg: 'An error occurred while deleting the form' });
+    console.log(error);
+    return response_500(res, 'Server Error', error);
   }
 }
 
