@@ -367,7 +367,7 @@ export async function deleteForm(req, res) {
 export async function generateSubmissionLink(req, res) {
   try {
     const { formId } = req.params;
-    const { hostUrl } = req.query;
+    const { hostUrl } = req.body;
     let submissionLinkGeneratedAt = Date.now();
     let encryptedStr = await encryptString(
       JSON.stringify({ formId, submissionLinkGeneratedAt }),
