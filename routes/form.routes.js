@@ -21,5 +21,9 @@ router.delete('/:formId', verifiedMiddleware, deleteForm);
 router.get('/dashboard/:formId', verifiedMiddleware, getForm);
 router.get('/submissions/:formId', verifiedMiddleware, getFormSubmissions);
 router.get('/csv/:formId', verifiedMiddleware, generateCSV);
-router.get('/submissionLink', verifiedMiddleware, generateSubmissionLink);
+router.get(
+  '/submissionLink/:formId',
+  verifiedMiddleware,
+  generateSubmissionLink,
+);
 export default router;
