@@ -9,6 +9,7 @@ import {
   getForm,
   getFormSubmissions,
   generateCSV,
+  generateSubmissionLink,
 } from '../controllers/form.controller.js';
 const router = Router();
 
@@ -20,4 +21,5 @@ router.delete('/', verifiedMiddleware, deleteForm);
 router.get('/dashboard/:formId', verifiedMiddleware, getForm);
 router.get('/submissions/:formId', verifiedMiddleware, getFormSubmissions);
 router.get('/csv/:formId', verifiedMiddleware, generateCSV);
+router.get('/submissionLink', verifiedMiddleware, generateSubmissionLink);
 export default router;
