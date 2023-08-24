@@ -5,6 +5,7 @@ import { verifycaptcha } from '../utils/recaptcha.js';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import InvitedCollaborator from '../models/invitedCollaborators.model.js';
 
 export function getVerificationLink(req, res) {
   if (req.user.verified)
@@ -111,7 +112,19 @@ export async function dashboard(req, res) {
       options: { sort: { createdAt: -1 } },
       select: 'projectId name forms allowedOrigins createdAt',
     });
+    let collaboratedProjects = await InvitedCollaborator.find({
+      status: 'Accepted',
+      email: req.user.email,
+    })
+      .populate({
+        path: 'projectId',
+        select: 'projectId name forms allowedOrigins createdAt',
+      })
+      .toJSON();
     user = await user.toJSON();
+    collaboratedProjects.forEach((collabProjectObj) => {
+      user.projects.push(collabProjectObj.projectId);
+    });
     user.project_count = user.projects.length;
     user.projects.map((project) => {
       project.date_created = project.createdAt;

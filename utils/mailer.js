@@ -13,7 +13,7 @@ let transporter = nodemailer.createTransport({
 
 const BASE_URL =
   process.env.ENV === 'prod'
-    ? 'https://www.savemyform.tk'
+    ? 'https://www.savemyform.in.net'
     : 'http://localhost:3000';
 
 export function mailer(subject, email, body, html) {
@@ -64,11 +64,7 @@ export function sendVerificationLink(email, secret, ip) {
   });
 }
 
-export function sendCollabInvitationLink(
-  email,
-  secret,
-  projectName
-) {
+export function sendCollabInvitationLink(email, secret, projectName) {
   let link = BASE_URL + '/collab/' + secret;
   const handlebarOptions = {
     viewEngine: {
@@ -86,7 +82,7 @@ export function sendCollabInvitationLink(
     context: {
       url: link,
       projectName,
-      userEmail:email
+      userEmail: email,
     },
   };
   transporter.sendMail(mailOptions, (err, info) => {

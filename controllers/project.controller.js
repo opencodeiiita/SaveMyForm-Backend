@@ -124,30 +124,12 @@ export async function updateProject(req, res) {
       updatedProject.allowedOrigins = req.body.allowedOrigins;
     }
 
-    if (req.body.collaborators) {
-      if (req.body.collaborators.length > 5) {
-        return response_400(
-          res,
-          'Number of collaborators cannot be greater than 5',
-        );
-      }
-      inviteCollaborators(
-        req.body.collaborators,
-        projectId,
-        req.body.name,
-        req.user.name,
-        req.user.email,
-      );
-    }
-
     // updating the project details in DB
     const finalProject = await Project.findOneAndUpdate(
       { projectId: projectId },
       updatedProject,
       { returnDocument: 'after', select: '-_id -forms' },
-    )
-      .populate({ path: 'owner', select: '-_id name email' })
-      .populate({ path: 'collaborators', select: '-_id name email' });
+    ).populate({ path: 'owner', select: '-_id name email' });
 
     finalProject.is_owner = req.user.id === finalProject.owner;
 
@@ -160,7 +142,10 @@ export async function updateProject(req, res) {
 export async function projectDashboard(req, res) {
   let project = await Project.findOne({ projectId: req.params.id });
   if (!project) return response_400(res, 'No project with this id');
-  let allow = project.collaborators.includes(req.user._id);
+  let allow = Collaborators.exists({
+    email: req.user.email,
+    projectId: project._id,
+  });
   if (!allow && String(project.owner) !== String(req.user._id))
     return response_400(res, 'You cannot access this project');
 
@@ -168,7 +153,6 @@ export async function projectDashboard(req, res) {
     project = await Project.findOne({ projectId: req.params.id })
       .populate('forms', 'formId name submission createdAt updatedAt -_id')
       .populate('owner', 'name email')
-      .populate('collaborators', 'name email -_id')
       .select('-_id -createdAt -updatedAt -__v');
     project = project.toJSON();
     project.is_owner = String(project.owner._id) === String(req.user._id);
@@ -267,14 +251,13 @@ export async function updateCollaborator(req, res) {
 
 export async function updateCollaboratorStatus(req, res) {
   try {
-    if(req.body.userAccepted){
-      let collaborator=await Collaborators.findById(req.body.collaboratorId);
-      collaborator.status='Accepted'
+    if (req.body.userAccepted) {
+      let collaborator = await Collaborators.findById(req.body.collaboratorId);
+      collaborator.status = 'Accepted';
       collaborator.save();
-    }
-    else{
+    } else {
       await Collaborators.findByIdAndDelete(req.body.collaboratorId);
-    } 
+    }
   } catch (error) {
     console.log(error);
     return response_500(res, 'Server error', error);

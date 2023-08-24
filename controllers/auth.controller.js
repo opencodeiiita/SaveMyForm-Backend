@@ -14,7 +14,7 @@ const client = new OAuth2Client(
   process.env.GOOGLE_OAUTH_CLIENT_ID,
   process.env.GOOGLE_OAUTH_CLIENT_SECRET,
   process.env.ENV === 'prod'
-    ? 'https://savemyform.tk/signin/oauth'
+    ? 'https://savemyform.in.net/signin/oauth'
     : 'http://localhost:3000/signin/oauth',
 );
 

@@ -205,7 +205,7 @@ The following properties of every endpoint will be descibed in this file:
       "id": "Project Id"
       "name": "Project Name",
       "form_count": 5,
-      "allowed_origins": ["http://localhost", "https://savemyform.tk"],
+      "allowed_origins": ["http://localhost", "https://savemyform.in.net"],
       "date_created": "date-of-creation"
     }
   ]
@@ -244,7 +244,7 @@ The following properties of every endpoint will be descibed in this file:
   "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
-  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "allowedOrigins": ["http://localhost", "https://savemyform.in.net"],
   "collaborators": ["test1@test.com", "test2@test.com"],
   "recaptcha_token": "Google Recaptcha Token recieved from Google"
 }
@@ -283,7 +283,7 @@ The following properties of every endpoint will be descibed in this file:
   "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
-  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "allowedOrigins": ["http://localhost", "https://savemyform.in.net"],
   "form_count": 2,
   "forms":[
     {
@@ -309,7 +309,7 @@ The following properties of every endpoint will be descibed in this file:
   "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
-  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "allowedOrigins": ["http://localhost", "https://savemyform.in.net"],
   "collaborators": ["test1@test.com", "test2@test.com"],
   "recaptcha_token": "Google Recaptcha Token recieved from Google",
   "password": "user's password"
@@ -335,7 +335,7 @@ The following properties of every endpoint will be descibed in this file:
   "hasRecaptcha": true,
   "recaptchaKey": "User's project Recaptcha Key",
   "recaptchaSecret": "User's project Recaptcha Secret",
-  "allowedOrigins": ["http://localhost", "https://savemyform.tk"],
+  "allowedOrigins": ["http://localhost", "https://savemyform.in.net"],
 }
 ```
 
